@@ -28,3 +28,607 @@ scr_path = "Z:/DATA/Dta_files/SCR_TERADATA"
 
 a = Sys.time()
 setwd(data_path)
+
+#Parameters
+sex_use = 1
+min_age =24
+initial_year = 1995
+final_year = 2017
+years_prior = 3
+years_advance = 5
+min_years = 3
+min_employees = 30
+
+#Read RAIS information
+setwd(data_path)
+df_rais <- read_parquet("RAIS_agg.parquet") %>% 
+  #alterations on occupation measure (look only at 2-digits)
+  mutate(cbo_94 = substr(as.character(cbo_94),1,2),
+         cbo_02 = substr(as.character(cbo_02),1,2))
+
+#IN 2010 I dont have pis information, 
+#but we can search for it in other years
+df_rais_aux <- df_rais %>% 
+  group_by(cpf) %>% 
+  summarise(pis_aux = first(pis[!is.na(pis)]))
+  
+df_rais <- df_rais %>% 
+  left_join(df_rais_aux, by="cpf", na_matches = "never") %>% 
+  mutate(pis = ifelse(is.na(pis), pis_aux, pis)) %>% 
+  select(!pis_aux, cpf)
+
+rm(df_rais_aux)
+gc()
+
+#Get information in 1995 (could be in any year) for all workers
+setwd(data_path)
+df_rais_age <- df_rais %>% 
+  select(pis, ano, age) %>% 
+  #create s column of age in 1995 that will help us in the next steps
+  mutate(age_95 = idade-(ano -1995)) %>% 
+  #Drop individualas with inconsistent age (two or more distinct ages in 1995)
+  group_by(pis) %>% 
+  mutate(n_age = length(unique(age_95))) %>% 
+  filter(n_age == 1) %>% 
+  summarise(age_95 = max(age_95)) %>% 
+  ungroup()
+
+#Get information about where each individual worked in a given year
+df_rais_baseline <- df_rais %>% 
+  select(cnpj, emp_time, ano, pis, cnae_95, educ_hs, 
+         munic, age, cbo_94, cbo_02) %>% 
+  rename(cnpj_c = cnpj, 
+         emp_time_c = emp_time,
+         baseline = ano,
+         cnae_c = cnae_95,
+         educ_hs_c = educ_hs,
+         munic_c = munic,
+         age_c = age, 
+         cbo_02_c = cbo_02,
+         cbo_94_c = cbo_94)
+
+#Get information about where each individual worked in a given year
+df_rais_jobs = df_rais %>% 
+  select(cnpj, ano, pis, cbo_94, cbo_02)
+
+#Get a list of pis with the characteristics we want
+pis_keep <- df_rais %>% 
+  select(pis, sexo, idade, ano) %>% 
+  #who had at most one job in each year. So we will do this in three steps
+  #1) lets count how many jobs each individual had on each year
+  group_by(pis, ano) %>% 
+  mutate(n_empregos_t = n()) %>% 
+  ungroup() %>% 
+  #2) Create a variable defining if, in any year, this person had more than 1 job
+  group_by(pis) %>% 
+  mutate(mais_um_emprego_qualquer_ano = max(n_empregos_t)) %>%
+  ungroup() %>% 
+  #3) Filter out these people
+  filter(mais_um_emprego_qualquer_ano <=1) %>% 
+  #Then chose sex
+  filter(sex == sex_use) %>% 
+  #With age between our choices
+  filter(idade >= min_age & idade <= max_age) %>% 
+  select(pis) %>% 
+  pull() %>% 
+  unique()
+
+#Get information of # of employees on the firm and the plant level, per year
+setwd(data_path)
+df_firm = read_parquet("firm_employment_panel.parquet")
+
+#decrease the size of df_firm by choosing firms that our full sample of individuals worked
+cnpj_keep = df_rais %>% 
+  filter(pis %in% pis_keep) %>% 
+  select(cnpj) %>% 
+  unique() %>% 
+  pull()
+
+df_firm = df_firm %>% 
+  filter(cnpj %in% cnpj_keep)
+
+rm(cnpj_keep)
+gc()
+
+colnames(df_firm) = c("cnpj", "ano", "n_employees_c", "mass_layoff_c", "mass_layoff_c1")
+  
+
+
+#################################################
+#In this part, we will split our sample of pis in 100 parts and create
+#mini dataframes with each part, and, in the end, bind all of the
+#We do this for memory efficiency
+#################################################
+pis_splited_list = split(pis_keep, ceiling(seq_along(pis_keep)/(length(pis_keep)/9)))
+
+count_aux = 0
+a = Sys.time()
+
+for (i in (1 : length(pis_splited_list))){
+  gc()
+  pis_use = pis_splited_list[[i]]
+  
+  #Expand to create mini df
+  df_mini = expand_grid(pis = as.vector(pis_use),
+                        baseline = (initial_year+1):(final_year-1),
+                        ano = (initial_year):(final_year)
+                        )
+  
+  #Filter years nexto to baseline and transform pis to string
+  df_mini = df_mini %>% 
+    filter(ano >= baseline - years_prior, ano <= baseline + years_advance) %>% 
+    mutate(pis = as.character(pis)) %>% 
+    #Create a column of current year relative to baseline (t-c)
+    mutate(ano_relative_baseline = ano - baseline)
+  
+  gc()
+  
+  
+  #Inpute age
+  df_mini = df_mini %>% 
+    left_join(df_rais_age, by = "pis", na_matches = "never") %>% 
+    mutate(idade_t = idade_95 + (ano - 1995)) %>% 
+    #filter only individuals with the age we want
+    filter(idade_t >= min_age & idade_t <= max_age) %>% 
+    select(!idade_95)
+  
+  
+  #Inpute job information for year c
+  df_mini = df_mini %>% 
+    left_join(df_rais_baseline, by = c("pis", "baseline")) %>% 
+    #filter idividuals with age we want in all the baseline periods
+    filter(idade_c >= min_age + years_prior, idade_c <= max_age - years_advance)
+  
+  
+  #Filter individuals with at least 3 years of experience in the baseline year c
+  df_mini = df_mini %>% 
+    filter(!is.na(emp_time_c) & emp_time_c >= min_years*12) %>% 
+    #Also filter individuals without industry information in year c
+    filter(!is.na(cnae_c), cnae_c !=0)
+  
+  #Inpute job information for year c+1, c+2, c+3
+  df_mini = df_mini %>% 
+    mutate(baseline_c1 = baseline + 1,
+           baseline_c2 = baseline + 2,
+           baseline_c3 = baseline + 3,
+           baseline_cminus1 = baseline -1,
+           baseline_cminus2 = baseline -2,
+           baseline_cminus3 = baseline -3)
+  
+  df_mini = df_mini %>% 
+    left_join(df_rais_jobs %>% 
+                rename(baseline_c1 = ano, 
+                       cnpj_c1 = cnpj, 
+                       cbo_94_c1 = cbo_94,
+                       cbo_02_c1 = cbo_92),
+              by = c("pis", "baseline_c1"))
+  
+  df_mini = df_mini %>% 
+    left_join(df_rais_jobs %>% 
+                rename(baseline_c2 = ano, 
+                       cnpj_c2 = cnpj, 
+                       cbo_94_c2 = cbo_94,
+                       cbo_02_c2 = cbo_92),
+              by = c("pis", "baseline_c2"))
+  
+  df_mini = df_mini %>% 
+    left_join(df_rais_jobs %>% 
+                rename(baseline_c3 = ano, 
+                       cnpj_c3 = cnpj, 
+                       cbo_94_c3 = cbo_94,
+                       cbo_02_c3 = cbo_92),
+              by = c("pis", "baseline_c3"))
+  
+  #Define if a person lost his job between years c and c1
+  df_mini = df_mini %>% 
+    mutate(lost_job_c1 = case_when(cnpj_c == cnpj_c1 ~ 0,
+                                T ~1))
+  
+  #Create a variable indicating if a person worked in the same company of year c in the next 3 years
+  df_mini = df_mini %>% 
+    mutate(same_company_c = case_when(cnpj_c1 == cnpj_c |
+                                        cnpj_c2 == cnpj_c |
+                                        cnpj_c3 == cnpj_c ~ 1,
+                                      T ~ 0))
+  
+  #Create a variable indication if the person worked anywhere in the 3 years following
+  df_mini = df_mini %>% 
+    mutate(reemployed_3y_c = case_when(!is.na(cnpj_c1)|
+                                         !is.na(cnpj_c2)|
+                                         !is.na(cnpj_c3) ~ 1,
+                                       T ~ 0 ))
+  
+  #Inpute mass layoff (at year c1)
+  df_mini = df_mini %>% 
+    left_join(df_firm %>% select(!n_employees_c), join_by(cnpj_c == cnpj,
+                                                          baseline_c1 == ano))
+  
+  #Filter plants with the minimum number of employees required
+  df_mini = df_mini %>% 
+    filter(n_employees_c >= min_employees)
+  
+  #Inpute wage and employment information at year t
+  df_mini = df_mini %>% 
+    left_join(df_rais %>% select(pis, ano, wage_dec_sm, cpnj) %>% rename(wage_dec_sm_t = wage_dec_sm,
+                                                                         cnpj_t = cnpj),
+              by = c("pis", "ano")) %>% 
+    mutate(worked_t = case_when(!is.na(cnpj_t) ~ 1,
+                                T ~ 0))
+  
+  #Fill NA wages with 0
+  df_mini = df_mini %>% 
+    mutate(wage_dec_sm_t = ifelse(is.na(wage_dec_sm_t), 0, wage_dec_sm_t))
+  
+  #Define if lost job in a mass layoff
+  df_mini = df_mini %>% 
+    mutate(lost_job_mass_layoff_c1 = case_when(lost_job_c1 == 1 &
+                                                 same_company_c == 0 &
+                                                 mass_layoff_c1 == 1 ~ 1,
+                                               T ~ 0))
+  
+  ##For people who lost job and came back to work in 3 years,
+  ##define if it was on the same occupation
+  
+  #first, define occupation on reemployment
+  df_mini = df_mini %>% 
+    mutate(cbo_94_reemp = case_when(
+      lost_job_c1 == 1 & !is.na(cnpj_c1) ~ cbo_94_c1,
+      lost_job_c1 == 1 & !is.na(cnpj_c2) ~ cbo_94_c2,
+      lost_job_c1 == 1 & !is.na(cnpj_c3) ~ cbo_94_c3,
+      T ~NA)
+      ) %>% 
+    mutate(cbo_02_reemp = case_when(
+      lost_job_c1 == 1 & !is.na(cnpj_c1) ~ cbo_02_c1,
+      lost_job_c1 == 1 & !is.na(cnpj_c2) ~ cbo_02_c2,
+      lost_job_c1 == 1 & !is.na(cnpj_c3) ~ cbo_02_c3,
+      T ~NA)
+      )
+  
+  
+  #second, define if is the same occupation
+  df_mini = df_mini %>% 
+    mutate(reemp_same_occup = case_when(cbo_94_reemp == cbo_94_c | cbo_02_reemp == cbo_02 ~ 1,
+                                        T ~0))
+  
+  #drop no longer used columns
+  df_mini = df_mini %>% 
+    select(!c(cnpj_c1, cnpj_c2, cnpj_c3,
+              same_company_c, mass_layoff_c1,
+              cbo_94_c1,cbo_94_c2,cbo_94_c3,
+              cbo_02_c1,cbo_02_c2,cbo_02_c3))
+  
+  #bind to 1 dataframe
+  if(count_aux == 0){
+    df = df_mini 
+    count_aux = 1
+  } else {
+    df = rbind(df, df_mini)
+  }
+  
+}
+
+b = Sys.time()
+print(paste0("time to create mini DFs: ", (b-a)))
+rm(df_firm, df_plant, df_mini, df_rais, df_rais_age, df_rais_baseline, df_rais_jobs)
+
+Sys.sleep(60)
+gc()
+
+
+
+##########################
+#Additional informations
+##########################
+
+#Correct data types for memory purposes
+df = df %>% 
+  mutate_at(c(age_t, emp_time_c, munic_c, lost_job_c1, 
+              n_empoyees_c, lost_job_mass_layoff_c1), as.integer)
+
+gc()
+
+#Add municipality level information
+#GDP and informality by calendar year and municipality
+setwd(data_path)
+df_gdp_t = read_parquet("munic_data.parquet")
+
+df_gdp_t = df_gdp_t %>% 
+  rename(employed_m = empregado_m,
+         inf_rate_m = taxa_informal_m,
+         unemp_rate_m = taxa_desemprego_m,
+         var_gdp_m = pib_crescimento_m)
+
+colnames(df_gdp_t) = sapply(colnames(df_gdp_t), function(x) paste0(x,"_t"))
+
+df_gdp_t = df_gdp_t %>% 
+  rename(munic_c = municipio_t,
+         ano = ano_t) %>% 
+  mutate_at(c("munic_c", "ano"), as.integer)
+
+#merge by year and municipality
+df - df %>% 
+  left_join(df_gdp_t, by = c( "ano", "municipio_c"))
+
+#Add enforcement data at the municipality level
+setwd(data_path)
+df_enf = read_parquet("Distances_munic.parquet") %>% 
+  rename(munic_c = munic, 
+         dist_min_m = dist_min) %>% 
+  mutate(munic_c = substr(as.character(munic_c),1,6)) %>% 
+  select(munic_c, dist_min_m) %>% 
+  mutate_all(integer)
+
+#merge by municipality
+df = df %>% 
+  left_join(df_enf, by = "munic_c", na_matches = "never")
+
+#define enforcement levels
+mid_dist = quantile(df_enf$dist_min_m, 0.5, na.rm = T)
+low_dist = quantile(df_enf$dist_min_m, 0.25, na.rm = T)
+high_dist = quantile(df_enf$dist_min_m, 0.75, na.rm = T)
+
+df = df %>% 
+  mutate(high_enf = ifelse(dist_min_m <= mid_dist,1,0),
+         low_enf = 1 - high_enf)
+
+
+
+#Add national data at the calendar time level
+df_national = read_excel("series_nacionais.xlsx", sheet = "anual") %>% 
+  rename(var_gdp_t = var_pib_t,
+         minimum_wage_t= salario_minimo_t,
+         gdp_t = pib_t)
+
+df = df %>% 
+  left_join(df_national, by = "ano", na_matches = "never")
+
+#add gdp growth in the baseline year
+df_growth = read_excel("series_nacionais.xlsx", sheet = "anual") %>% 
+  select(ano, var_pib_t) %>% 
+  rename(baseline = ano, 
+         var_gdp_c = var_pib_t)
+
+df = df %>% 
+  left_join(df_growth, by = "baseline", na_matches = "never")
+
+
+#add gdp growth in the c1
+df_growth = read_excel("series_nacionais.xlsx", sheet = "anual") %>% 
+  select(ano, var_pib_t) %>% 
+  rename(baseline_c1 = ano, 
+         var_gdp_c1 = var_pib_t)
+
+
+df = df %>% 
+  left_join(df_growth, by = "baseline_c1", na_matches = "never")
+
+rm(df_gdp_t, df_growth, df_enf, df_national)
+gc()
+
+#Calculate real wages and log real wages
+df = df %>% 
+  mutate(real_wage_t = wage_dec_sm_t * minimum_wage_t * deflator_2010_t,
+         ln_real_wage_t = log(1+real_wage_t))
+
+#Define wage at baseline year
+df = df %>% 
+  group_by(pis, baseline) %>% 
+  mutate(real_wage_c = real_wage_t[ano == baseline]) %>% 
+  ungroup()
+
+
+#Drop individuals without wages in cohort year c
+df = df %>% 
+  filter(real_wage_c > 0)
+
+#Define how many times a person was ever laid off in a mass layoff
+df_count_layoff = df %>% 
+  select(pis, baseline, lost_job_mass_layoff_c1) %>% 
+  group_by(pis, baseline) %>% 
+  summarise_all(first) %>% 
+  ungroup() %>% 
+  group_by(pis) %>% 
+  summarise(times_treated = sum(lost_job_mass_layoff_c1)) %>% 
+  ungroup()
+
+#inpute this info back to main dataset
+df = df %>% 
+  left_join(df_count_layoff, by = "pis", na_matches = "never")
+
+rm(df_count_layoff)
+gc()
+
+#Filter individuals with at most 1 mass layoff in their careers
+df = df %>% 
+  filter(times_treated <= 1)
+
+#for individuals that were ever treated, keep only the information on the baseline year of treatment
+# that is, mske it impossible for them to be used as control for other individuals
+df = df %>% 
+  filter(times_treated == 0 |
+           (times_treated == 1 & lost_job_mass_layoff_c1 == 1))
+
+#Add wages for years prior and after baseline year c
+#aux df with wages by year
+aux_wage = df %>% 
+  group_by(pis, ano) %>% 
+  summarise(real_wage_t = first(real_wage_t)) %>% 
+  ungroup() %>% 
+  rename(baseline_cminus1 = ano, 
+         real_wage_cminus1 = real_wage_t)
+
+#Wages 1 year prior
+df = df %>% 
+  left_join(aux_wage, by = c("pis", "baseline_cminus1"), na_matches = "never")
+
+#Wages 2 years prior
+aux_wage = aux_wage %>% 
+  rename(baseline_cminus2 = baseline_cminus1,
+         real_wage_cminus2 = real_wage_cminus1)
+
+df = df %>% 
+  left_join(aux_wage, by = c("pis", "baseline_cminus2"), na_matches = "never")
+
+
+#Wages 3 years prior
+aux_wage = aux_wage %>% 
+  rename(baseline_cminus3 = baseline_cminus2,
+         real_wage_cminus3 = real_wage_cminus2)
+
+df = df %>% 
+  left_join(aux_wage, by = c("pis", "baseline_cminus3"), na_matches = "never")
+
+
+#Wages 1 year in advance
+aux_wage = aux_wage %>% 
+  rename(baseline_c1 = baseline_cminus3,
+         real_wage_c1 = real_wage_cminus3)
+
+df = df %>% 
+  left_join(aux_wage, by = c("pis", "baseline_c1"), na_matches = "never")
+
+
+#Wages 2 years in advance
+aux_wage = aux_wage %>% 
+  rename(baseline_c2 = baseline_c1,
+         real_wage_c2 = real_wage_c1)
+
+df = df %>% 
+  left_join(aux_wage, by = c("pis", "baseline_c2"), na_matches = "never")
+
+
+#Wages 3 years in advance
+aux_wage = aux_wage %>% 
+  rename(baseline_c3 = baseline_c2,
+         real_wage_c3 = real_wage_c2)
+
+df = df %>% 
+  left_join(aux_wage, by = c("pis", "baseline_c3"), na_matches = "never")
+
+
+#Drop individuals with 0 wage in the 3 years previous to dismissal
+df = df %>% 
+  filter(real_wage_cminus1 != 0 & real_wage_cminus2 != 0 & real_wage_cminus3 != 0 )
+
+
+#Wages relative to individual baseline wage
+df = df %>% 
+  mutate(wage_relative_t = real_wage_t/ real_wage_c -1)
+
+#Wages relative to average baseline wage
+baseline = df %>% 
+  filter(lost_job_mass_layoff_c1 == 1) %>% 
+  summarise(mean(real_wage_c)) %>% 
+  pull()
+
+df = df %>% 
+  mutate(wage_relative2_t = real_wage_t / baseline - 1)
+rm(baseline)
+
+#Wages relative to average baseline, per baseline year
+df = df %>% 
+  group_by(baseline) %>% 
+  mutate(base = mean(real_wage_c)) %>% 
+  ungroup() %>% 
+  mutate(wage_relative3_t = real_wage_t/ base - 1)
+
+#Indicator for whether or not individual was working at year t
+df = df %>% 
+  mutate(worked_t = ifelse(real_wage_t > 0,1,0))
+
+#Wages bins
+df = df %>% 
+  mutate(wage_bin_c = cut_width(real_wage_c, 250)) %>% 
+  mutate(wage_bin_cminus1 = cut_width(real_wage_cminus1, 250)) %>% 
+  mutate(wage_bin_cminus2 = cut_width(real_wage_cminus2, 250))
+  
+#Enforcement bins
+df = df %>% 
+  mutate(enforcement_bin_c = cut_width(dist_min_m, 50))
+
+#Firm size quartiles
+df= df %>% 
+  mutate(firm_size = cut_number(n_employees_c, 4))
+
+#Get additional information for the year the person lost her job (c1)
+df = df %>% 
+  group_by(pis, cohort) %>% 
+  mutate(var_gdp_m_c = var_gdp_m_t[ano_relative_baseline==0],
+         var_gdp_m_c1 = var_gdp_m_t[ano_relative_baseline == 1],
+         unemp_rate_m_c1 = umep_rate_m_t[ano_relative_baseline == 1],
+         inf_rate_m_c1 = inf_rate_m_t[ano_relative_baseline == 1]) %>% 
+  ungroup()
+
+#Defining recession years
+recession_years = c(1995,1998,2001,2003,2014,2015,2016,2020)
+df = df %>% 
+  mutate(recession_c = ifelse(baseline %in% recession_years,1,0),
+         recession_c1 = ifelse(baseline_c1 %in% recession_years, 1,0))
+
+#Defining informality level in 1991
+setwd(data_path)
+munic_data = read_parquet("munic_data.parquet")
+munic_data = munic_data %>% 
+  filter(ano == 1991) %>% 
+  select(municipio, taxa_informal_m) %>% 
+  rename(munic = municipio,
+         inf_rate_m = taxa_informal_m)
+
+low_inf = quantile(munic_data$inf_rate_m, 0.25, na.rm = T)
+mid_inf = quantile(munic_data$inf_rate_m, 0.5, na.rm = T)
+high_inf = quantile(munic_data$inf_rate_m, 0.75, na.rm = T)
+  
+munic_data = munic_data %>% 
+  mutate(high_inf_91 = case_when(inf_rate_m >= mid_inf ~1,
+                                 T ~ 0 ),
+         low_inf_91 = 1 - alta_inf) %>% 
+  rename(munic_c = munic,
+         inf_rate_91_m = inf_rate_m)
+
+df = df %>% 
+  left_join(munic_data, by = "munic_c", na_matches = "never")
+
+#Define state in cohort year (UF)
+df = df %>% 
+  mutate(munic_c = as.character(munic_c),
+         uf_c = substr(munic_c,1,2),
+         munic_c = as.integer(munic_c))
+
+#Define skill level
+df = df %>% 
+  rename(high_skill = educ_hs_c) %>% 
+  mutate(low_skill = 1 - high_skill)
+
+#Define post period
+df = df %>% 
+  mutate(post = ifelse(ano > baseline, 1,0))
+
+#Define 1 and 2-digit cnae (industry sector)
+df = df %>% 
+  mutate(cnae2_c = substr(as.character(cnar_c),1,2),
+         cnae_c = substr(as.character(cnar_c),1,1))
+
+#year/cnae/munic FE
+df = df %>% 
+  mutate(ano_munic_cnae_c = paste0(ano_relative_baseline, munic_c, cnae2_c))
+
+#Reorder columns alphabetically, but with some chosen ones appearing first
+df = df %>% 
+  select(sort(colnames(.))) %>% 
+  select(pis, baseline, ano, ano_relative_cohort, everything())
+
+#Save
+setwd(data_path)
+write_parquet(df, "sample_complete_information.parquet")
+
+rm(list = ls())
+
+Sys.sleep(60)
+gc()
+
+
+
+
+
+
+
