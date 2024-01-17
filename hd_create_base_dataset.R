@@ -33,7 +33,7 @@ setwd(data_path)
 sex_use = 1
 min_age =24
 initial_year = 1995
-final_year = 2017
+final_year = 2021
 years_prior = 3
 years_advance = 5
 min_years = 3
