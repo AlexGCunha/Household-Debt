@@ -33,7 +33,7 @@ aux_count = 0
 for (i in 1994:2021){
   setwd(data_path)
   year = substr(i,3,4)
-  filename = paste0("RAIS_firm_",i,".dta")
+  filename = paste0("RAIS_firm_",year,".dta")
   
   df_aux = read_stata(filename) %>% 
     mutate(ano = i)
