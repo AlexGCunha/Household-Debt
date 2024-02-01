@@ -240,7 +240,6 @@ clear
 local sql_statement
 SELECT [RADIC CNPJ] as cnpj
 ,COUNT([RADIC CNPJ]) as n_employees
-FROM [Depep].[dbo].[RAIS2005]
 WHERE [TP VINCULO] IN ('10', '15', '20', '25', '40', '55', '80') AND [EMP EM 31 12] = '1'
 GROUP BY [RADIC CNPJ]
 

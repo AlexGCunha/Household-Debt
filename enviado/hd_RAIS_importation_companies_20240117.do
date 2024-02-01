@@ -21,7 +21,7 @@ local sql_statement
 SELECT [CNPJ Raiz] as cnpj
 ,COUNT([CNPJ Raiz]) as n_employees
 FROM [Depep].[dbo].[RAIS1994]
-WHERE [Tipo Vínculo] IN ('10', '15', '20', '25', '40', '55', '80') AND [Vínculo Ativo 31 12] = '1'
+WHERE [Tipo Vínculo] IN ('10', '15', '20', '25', '40', '55', '80') AND [Vínculo Ativo 31 12] = 1
 GROUP BY [CNPJ Raiz]
 ;
 #delimit cr
@@ -40,7 +40,7 @@ local sql_statement
 SELECT [CNPJ Raiz] as cnpj
 ,COUNT([CNPJ Raiz]) as n_employees
 FROM [Depep].[dbo].[RAIS1995]
-WHERE [Tipo Vínculo] IN ('10', '15', '20', '25', '40', '55', '80')  AND[Vínculo Ativo 31 12] = '1'
+WHERE [Tipo Vínculo] IN ('10', '15', '20', '25', '40', '55', '80')  AND[Vínculo Ativo 31 12] = 1
 GROUP BY [CNPJ Raiz]
 
 ;
@@ -60,7 +60,7 @@ local sql_statement
 SELECT [CNPJ Raiz] as cnpj
 ,COUNT([CNPJ Raiz]) as n_employees
 FROM [Depep].[dbo].[RAIS1996]
-WHERE [Tipo Vínculo] IN ('10', '15', '20', '25', '40', '55', '80') AND [Vínculo Ativo 31 12] = '1'
+WHERE [Tipo Vínculo] IN ('10', '15', '20', '25', '40', '55', '80') AND [Vínculo Ativo 31 12] = 1
 GROUP BY [CNPJ Raiz]
 
 ;
@@ -77,10 +77,10 @@ clear
 #delimit ;
 
 local sql_statement
-SELECT [CNPJ Raiz] as cnpj
+SELECT SELECT [CNPJ Raiz] as cnpj
 ,COUNT([CNPJ Raiz]) as n_employees
 FROM [Depep].[dbo].[RAIS1997]
-WHERE [Tipo Vínculo] IN ('10', '15', '20', '25', '40', '55', '80') AND[Vínculo Ativo 31 12] = '1'
+WHERE [Tipo Vínculo] IN ('10', '15', '20', '25', '40', '55', '80') AND[Vínculo Ativo 31 12] = 1
 GROUP BY [CNPJ Raiz]
 
 ;
@@ -100,7 +100,7 @@ local sql_statement
 SELECT [CNPJ Raiz] as cnpj
 ,COUNT([CNPJ Raiz]) as n_employees
 FROM [Depep].[dbo].[RAIS1998]
-WHERE [Tipo Vínculo] IN ('10', '15', '20', '25', '40', '55', '80')  AND [Vínculo Ativo 31 12] = '1'
+WHERE [Tipo Vínculo] IN ('10', '15', '20', '25', '40', '55', '80')  AND [Vínculo Ativo 31 12] = 1
 GROUP BY [CNPJ Raiz]
 
 ;
@@ -120,7 +120,7 @@ local sql_statement
 SELECT [CNPJ Raiz] as cnpj
 ,COUNT([CNPJ Raiz]) as n_employees
 FROM [Depep].[dbo].[RAIS1999]
-WHERE [Tipo Vínculo] IN ('10', '15', '20', '25', '40', '55', '80') AND [Vínculo Ativo 31 12] = '1'
+WHERE [Tipo Vínculo] IN ('10', '15', '20', '25', '40', '55', '80') AND [Vínculo Ativo 31 12] = 1
 GROUP BY [CNPJ Raiz]
 
 ;
@@ -140,7 +140,7 @@ local sql_statement
 SELECT [CNPJ Raiz] as cnpj
 ,COUNT([CNPJ Raiz]) as n_employees
 FROM [Depep].[dbo].[RAIS2000]
-WHERE [Tipo Vínculo] IN ('10', '15', '20', '25', '40', '55', '80') AND [Vínculo Ativo 31 12] = '1'
+WHERE [Tipo Vínculo] IN ('10', '15', '20', '25', '40', '55', '80') AND [Vínculo Ativo 31 12] = 1
 GROUP BY [CNPJ Raiz]
 
 ;
@@ -160,7 +160,7 @@ local sql_statement
 SELECT [CNPJ Raiz] as cnpj
 ,COUNT([CNPJ Raiz]) as n_employees
 FROM [Depep].[dbo].[RAIS2001]
-WHERE [Tipo Vínculo] IN ('10', '15', '20', '25', '40', '55', '80') AND [Vínculo Ativo 31 12] = '1'
+WHERE [Tipo Vínculo] IN ('10', '15', '20', '25', '40', '55', '80') AND [Vínculo Ativo 31 12] = 1
 GROUP BY [CNPJ Raiz]
 
 ;
@@ -180,7 +180,7 @@ local sql_statement
 SELECT [RADIC CNPJ] as cnpj
 ,COUNT([RADIC CNPJ]) as n_employees
 FROM [Depep].[dbo].[RAIS2002]
-WHERE [TP VINCL] IN ('10', '15', '20', '25', '40', '55', '80') AND [EMP EM 31 12] = '1'
+WHERE [TP VINCL] IN ('10', '15', '20', '25', '40', '55', '80') AND [EMP EM 31 12] = 1
 GROUP BY [RADIC CNPJ]
 
 ;
@@ -200,7 +200,7 @@ local sql_statement
 SELECT [RADIC CNPJ] as cnpj
 ,COUNT([RADIC CNPJ]) as n_employees
 FROM [Depep].[dbo].[RAIS2003]
-WHERE [TP VINCULO] IN ('10', '15', '20', '25', '40', '55', '80') AND [EMP EM 31 12] = '1'
+WHERE [TP VINCULO] IN ('10', '15', '20', '25', '40', '55', '80') AND [EMP EM 31 12] = 1
 GROUP BY [RADIC CNPJ]
 
 ;
@@ -220,7 +220,7 @@ local sql_statement
 SELECT [RADIC CNPJ] as cnpj
 ,COUNT([RADIC CNPJ]) as n_employees
 FROM [Depep].[dbo].[RAIS2004]
-WHERE [TP VINCULO] IN ('10', '15', '20', '25', '40', '55', '80') AND [EMP EM 31 12] = '1'
+WHERE [TP VINCULO] IN ('10', '15', '20', '25', '40', '55', '80') AND [EMP EM 31 12] = 1
 GROUP BY [RADIC CNPJ]
 
 
@@ -240,8 +240,7 @@ clear
 local sql_statement
 SELECT [RADIC CNPJ] as cnpj
 ,COUNT([RADIC CNPJ]) as n_employees
-FROM [Depep].[dbo].[RAIS2005]
-WHERE [TP VINCULO] IN ('10', '15', '20', '25', '40', '55', '80') AND [EMP EM 31 12] = '1'
+WHERE [TP VINCULO] IN ('10', '15', '20', '25', '40', '55', '80') AND [EMP EM 31 12] = 1
 GROUP BY [RADIC CNPJ]
 
 
@@ -262,7 +261,7 @@ local sql_statement
 SELECT [RADIC CNPJ] as cnpj
 ,COUNT([RADIC CNPJ]) as n_employees
 FROM [Depep].[dbo].[RAIS2006]
-WHERE [TP VINCULO] IN ('10', '15', '20', '25', '40', '55', '80') AND [EMP EM 31 12] = '1'
+WHERE [TP VINCULO] IN ('10', '15', '20', '25', '40', '55', '80') AND [EMP EM 31 12] = 1
 GROUP BY [RADIC CNPJ]
 
 ;
@@ -282,7 +281,7 @@ local sql_statement
 SELECT [RADIC CNPJ] as cnpj
 ,COUNT([RADIC CNPJ]) as n_employees
 FROM [Depep].[dbo].[RAIS2007]
-WHERE [TP VINCULO] IN ('10', '15', '20', '25', '40', '55', '80') AND [EMP EM 31 12] = '1'
+WHERE [TP VINCULO] IN ('10', '15', '20', '25', '40', '55', '80') AND [EMP EM 31 12] = 1
 GROUP BY [RADIC CNPJ]
 
 
@@ -303,7 +302,7 @@ local sql_statement
 SELECT [RADIC CNPJ] as cnpj
 ,COUNT([RADIC CNPJ]) as n_employees
 FROM [Depep].[dbo].[RAIS2008]
-WHERE [TP VINCULO] IN ('10', '15', '20', '25', '40', '55', '80')  AND [EMP EM 31 12] = '1'
+WHERE [TP VINCULO] IN ('10', '15', '20', '25', '40', '55', '80')  AND [EMP EM 31 12] = 1
 GROUP BY [RADIC CNPJ]
 
 
@@ -325,7 +324,7 @@ local sql_statement
 SELECT [RADIC CNPJ] as cnpj
 ,COUNT([RADIC CNPJ]) as n_employees
 FROM [Depep].[dbo].[RAIS2009]
-WHERE [TP VINCULO] IN ('10', '15', '20', '25', '40', '55', '80')  AND [EMP EM 31 12] = '1'
+WHERE [TP VINCULO] IN ('10', '15', '20', '25', '40', '55', '80')  AND [EMP EM 31 12] = 1
 GROUP BY [RADIC CNPJ]
 
 
@@ -346,7 +345,7 @@ local sql_statement
 SELECT [RADIC CNPJ] as cnpj
 ,COUNT([RADIC CNPJ]) as n_employees
 FROM [Depep].[dbo].[RAIS2010]
-WHERE [TP VINCULO] IN ('10', '15', '20', '25', '40', '55', '80') AND [EMP EM 31 12] = '1'
+WHERE [TP VINCULO] IN ('10', '15', '20', '25', '40', '55', '80') AND [EMP EM 31 12] = 1
 GROUP BY [RADIC CNPJ]
 
 ;
@@ -366,7 +365,7 @@ local sql_statement
 SELECT [CNPJ Raiz] as cnpj
 ,COUNT([CNPJ Raiz]) as n_employees
 FROM [Depep].[dbo].[RAIS2011]
-WHERE [Tipo Vínculo] IN ('10', '15', '20', '25', '40', '55', '80') AND [Vínculo Ativo 31 12] = '1'
+WHERE [Tipo Vínculo] IN ('10', '15', '20', '25', '40', '55', '80') AND [Vínculo Ativo 31 12] = 1
 GROUP BY [CNPJ Raiz]
 
 
@@ -387,7 +386,7 @@ local sql_statement
 SELECT [CNPJ Raiz] as cnpj
 ,COUNT([CNPJ Raiz]) as n_employees
 FROM [Depep].[dbo].[RAIS2012]
-WHERE [Tipo Vínculo] IN ('10', '15', '20', '25', '40', '55', '80')  AND [Vínculo Ativo 31 12] = '1'
+WHERE [Tipo Vínculo] IN ('10', '15', '20', '25', '40', '55', '80')  AND [Vínculo Ativo 31 12] = 1
 GROUP BY [CNPJ Raiz]
 
 ;
@@ -407,7 +406,7 @@ local sql_statement
 SELECT [CNPJ Raiz] as cnpj
 ,COUNT([CNPJ Raiz]) as n_employees
 FROM [Depep].[dbo].[RAIS2013]
-WHERE [Tipo Vínculo] IN ('10', '15', '20', '25', '40', '55', '80')  AND [Vínculo Ativo 31 12] = '1'
+WHERE [Tipo Vínculo] IN ('10', '15', '20', '25', '40', '55', '80')  AND [Vínculo Ativo 31 12] = 1
 GROUP BY [CNPJ Raiz]
 
 ;
@@ -427,7 +426,7 @@ local sql_statement
 SELECT [CNPJ Raiz] as cnpj
 ,COUNT([CNPJ Raiz]) as n_employees
 FROM [Depep].[dbo].[RAIS2014]
-WHERE [Tipo Vínculo] IN ('10', '15', '20', '25', '40', '55', '80')  AND [Vínculo Ativo 31 12] = '1'
+WHERE [Tipo Vínculo] IN ('10', '15', '20', '25', '40', '55', '80')  AND [Vínculo Ativo 31 12] = 1
 GROUP BY [CNPJ Raiz]
 
 ;
@@ -447,7 +446,7 @@ local sql_statement
 SELECT [CNPJ Raiz] as cnpj
 ,COUNT([CNPJ Raiz]) as n_employees
 FROM [Depep].[dbo].[RAIS2015]
-WHERE [Tipo Vínculo] IN ('10', '15', '20', '25', '40', '55', '80') AND [Vínculo Ativo 31 12] = '1'
+WHERE [Tipo Vínculo] IN ('10', '15', '20', '25', '40', '55', '80') AND [Vínculo Ativo 31 12] = 1
 GROUP BY [CNPJ Raiz]
 
 ;
@@ -467,7 +466,7 @@ local sql_statement
 SELECT [cnpjraiz] as cnpj
 ,COUNT([cnpjraiz]) as n_employees
 FROM [Depep].[dbo].[RAIS2016]
-WHERE [tipovinculo] IN ('10', '15', '20', '25', '40', '55', '80') AND [vinculoativo3112] = '1'
+WHERE [tipovinculo] IN ('10', '15', '20', '25', '40', '55', '80') AND [vinculoativo3112] = 1
 GROUP BY [cnpjraiz]
 
 ;
@@ -487,7 +486,7 @@ local sql_statement
 SELECT [cnpjraiz] as cnpj
 ,COUNT([cnpjraiz]) as n_employees
 FROM [Depep].[dbo].[RAIS2017]
-WHERE [tipovinculo] IN ('10', '15', '20', '25', '40', '55', '80')  AND [vinculoativo3112] = '1'
+WHERE [tipovinculo] IN ('10', '15', '20', '25', '40', '55', '80')  AND [vinculoativo3112] = 1
 GROUP BY [cnpjraiz]
 
 ;
@@ -507,7 +506,7 @@ local sql_statement
 SELECT [cnpjraiz] as cnpj
 ,COUNT([cnpjraiz]) as n_employees
 FROM [Depep].[dbo].[RAIS2018]
-WHERE [tipovinculo] IN ('10', '15', '20', '25', '40', '55', '80') AND [vinculoativo3112] = '1'
+WHERE [tipovinculo] IN ('10', '15', '20', '25', '40', '55', '80') AND [vinculoativo3112] = 1
 GROUP BY [cnpjraiz]
 
 ;
@@ -527,7 +526,7 @@ local sql_statement
 SELECT [cnpjraiz] as cnpj
 ,COUNT([cnpjraiz]) as n_employees
 FROM [Depep].[dbo].[RAIS2019]
-WHERE [tipovinculo] IN ('10', '15', '20', '25', '40', '55', '80')  AND [vinculoativo3112] = '1'
+WHERE [tipovinculo] IN ('10', '15', '20', '25', '40', '55', '80')  AND [vinculoativo3112] = 1
 GROUP BY [cnpjraiz]
 
 ;
@@ -547,7 +546,7 @@ local sql_statement
 SELECT [cnpjraiz] as cnpj
 ,COUNT([cnpjraiz]) as n_employees
 FROM [Depep].[dbo].[RAIS2020]
-WHERE [tipovinculo] IN ('10', '15', '20', '25', '40', '55', '80')  AND [vinculoativo3112] = '1'
+WHERE [tipovinculo] IN ('10', '15', '20', '25', '40', '55', '80')  AND [vinculoativo3112] = 1
 GROUP BY [cnpjraiz]
 
 ;
@@ -567,7 +566,7 @@ local sql_statement
 SELECT [cnpjraiz] as cnpj
 ,COUNT([cnpjraiz]) as n_employees
 FROM [Depep].[dbo].[RAIS2021]
-WHERE [tipovinculo] IN ('10', '15', '20', '25', '40', '55', '80') AND [vinculoativo3112] = '1'
+WHERE [tipovinculo] IN ('10', '15', '20', '25', '40', '55', '80') AND [vinculoativo3112] = 1
 GROUP BY [cnpjraiz]
 
 ;

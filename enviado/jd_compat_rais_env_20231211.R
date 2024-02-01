@@ -1,7 +1,6 @@
 #------------------------------------------------------------------------------------------------------------------------------
 #This code will:
 #- Make RAIS files compatible through years 
-# These rais files were downloaded via sql from the code hd_RAIS_importation_teradata
 #------------------------------------------------------------------------------------------------------------------------------
 
 
@@ -31,57 +30,57 @@ setwd(data_path)
 ###################################
 #1994-2001
 ###################################
-for (i in c(1994:2001)){
-  #Open file and filter individuals who were working in December
-  year = substr(i, 3,4)
-  filename = paste0("RAIS_hd_",year,".dta")
-  df <- read_dta(filename) %>% 
-    mutate(active = as.integer(active)) %>% 
-    filter(active == 1)
-  
-  #correct some numeric variables that have a "," as decimal separator
-  variables <- c("emp_time", "wage_dec_sm")
-  df <- df %>% 
-    mutate(across(all_of(variables),as.character)) %>% 
-    mutate(across(all_of(variables),~str_replace_all(.,"[.]",""))) %>%
-    mutate(across(all_of(variables),~str_replace_all(.,"[,]",".")))
-  
-  #convert columns
-  int_cols = c("munic","emp_type","quit_reason","quit_month",
-               "educ_85","sex","hire_month","age","cnae_95",
-               "wk_hours")
-  continuous_cols <- c("emp_time", "wage_dec_sm")
-  char_cols = c("cbo_94","pis","cnpj")
-  
-  df <- df %>% 
-    mutate(across(all_of(int_cols), as.integer)) %>% 
-    mutate(across(all_of(continuous_cols), as.numeric)) %>% 
-    mutate(across(all_of(char_cols), as.character))
-  
-  #create some education dummies
-  df <- df %>% 
-    mutate(educ_fund = ifelse(educ_85 >=5,1,0),
-           educ_hs = ifelse(educ_85 >= 7,1,0),
-           educ_col = ifelse(educ_85 >= 9,1,0))
-  
-  #drop unnecessary columns
-  df <- df %>% 
-    select(!any_of(c("active","wage_dec_nom", "educ_85","educ", "born_date", "nc")))
-  
-  #Add columns
-  df<- df %>% 
-    mutate(cpf = rep(NA, nrow(df)),
-           color = rep(NA, nrow(df)),
-           cbo_02 = rep(NA, nrow(df)),
-           ano = i)
-  
-  #Save
-  filename = paste0("RAIS_comp_",year,".parquet")
-  write_parquet(df, filename)
-  
-  print(i)
-  
-}
+# for (i in c(1994:2001)){
+#   #Open file and filter individuals who were working in December
+#   year = substr(i, 3,4)
+#   filename = paste0("RAIS_hd_",year,".dta")
+#   df <- read_dta(filename) %>% 
+#     mutate(active = as.integer(active)) %>% 
+#     filter(active == 1)
+#   
+#   #correct some numeric variables that have a "," as decimal separator
+#   variables <- c("emp_time", "wage_dec_sm")
+#   df <- df %>% 
+#     mutate(across(all_of(variables),as.character)) %>% 
+#     mutate(across(all_of(variables),~str_replace_all(.,"[.]",""))) %>%
+#     mutate(across(all_of(variables),~str_replace_all(.,"[,]",".")))
+#   
+#   #convert columns
+#   int_cols = c("munic","emp_type","quit_reason","quit_month",
+#                "educ_85","sex","hire_month","age","cnae_95",
+#                "wk_hours")
+#   continuous_cols <- c("emp_time", "wage_dec_sm")
+#   char_cols = c("cbo_94","pis","cnpj")
+#   
+#   df <- df %>% 
+#     mutate(across(all_of(int_cols), as.integer)) %>% 
+#     mutate(across(all_of(continuous_cols), as.numeric)) %>% 
+#     mutate(across(all_of(char_cols), as.character))
+#   
+#   #create some education dummies
+#   df <- df %>% 
+#     mutate(educ_fund = ifelse(educ_85 >=5,1,0),
+#            educ_hs = ifelse(educ_85 >= 7,1,0),
+#            educ_col = ifelse(educ_85 >= 9,1,0))
+#   
+#   #drop unnecessary columns
+#   df <- df %>% 
+#     select(!any_of(c("active","wage_dec_nom", "educ_85","educ", "born_date", "nc")))
+#   
+#   #Add columns
+#   df<- df %>% 
+#     mutate(cpf = rep(NA, nrow(df)),
+#            color = rep(NA, nrow(df)),
+#            cbo_02 = rep(NA, nrow(df)),
+#            ano = i)
+#   
+#   #Save
+#   filename = paste0("RAIS_comp_",year,".parquet")
+#   write_parquet(df, filename)
+#   
+#   print(i)
+#   
+# }
 
 ###################################
 #2002
