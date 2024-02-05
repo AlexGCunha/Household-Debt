@@ -623,6 +623,8 @@ df = df %>%
 setwd(data_path)
 write_parquet(df, "sample_complete_information.parquet")
 
+print(str(df))
+
 fin_time = Sys.time()
 print(paste0("Tempo para rodar este código:", (fin_time - ini_time)))
 
