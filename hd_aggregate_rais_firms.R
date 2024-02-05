@@ -1,7 +1,7 @@
 #------------------------------------------------------------------------------------------------------------------------------
 #This code will:
 #- Aggregate employment per firm data downloaded from RAIS TERADATA
-#- Define, for each company, if it had a mass layoff in the oberseverd years
+#- Define, for each company, if it had a mass layoff in the obseverd years
 #- These data were downloaded with the hd_RAIS_importation_companies file
 #------------------------------------------------------------------------------------------------------------------------------
 
