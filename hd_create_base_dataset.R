@@ -53,7 +53,9 @@ df_rais <- read_parquet("RAIS_agg.parquet") %>%
   #Correct cells starting with "{}"
   str_replace(is.character, replace_brace) %>% 
   #Now, lets erase the initial "CBO" in some cells
-  mutate(across(c(cbo_94, cbo_02), ~ str_remove_all(.,"CBO")))
+  mutate(cbo_94 = str_remove(cbo_94, "^CBO"),
+         cbo_02 = str_remove(cbo_02, "^CBO")
+         ) %>% 
   #Finaly, lets trim to delete empty spaces
   mutate(across(c(cbo_94, cbo_02), str_trim)) %>% 
   #alterations on occupation measure (look only at 2-digits)
