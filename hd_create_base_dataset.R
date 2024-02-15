@@ -41,9 +41,21 @@ years_advance = 5
 min_years = 3
 min_employees = 30
 
+#Create a function to insert NA in columns that starts with "{}"
+replace_brace <- function(column) {
+  column %>%
+    str_replace("^\\{.*", NA_character_)
+}
+
 #Read RAIS information
 setwd(data_path)
 df_rais <- read_parquet("RAIS_agg.parquet") %>% 
+  #Correct cells starting with "{}"
+  str_replace(is.character, replace_brace) %>% 
+  #Now, lets erase the initial "CBO" in some cells
+  mutate(across(c(cbo_94, cbo_02), ~ str_remove_all(.,"CBO")))
+  #Finaly, lets trim to delete empty spaces
+  mutate(across(c(cbo_94, cbo_02), str_trim)) %>% 
   #alterations on occupation measure (look only at 2-digits)
   mutate(cbo_94 = substr(as.character(cbo_94),1,2),
          cbo_02 = substr(as.character(cbo_02),1,2))
