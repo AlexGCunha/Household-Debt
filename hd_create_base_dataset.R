@@ -51,11 +51,11 @@ replace_brace <- function(column) {
 setwd(data_path)
 df_rais <- read_parquet("RAIS_agg.parquet") %>% 
   #Correct cells starting with "{}"
-  str_replace(is.character, replace_brace) %>% 
+  mutate(across(where(is.character), replace_brace)) %>% 
   #Now, lets erase the initial "CBO" in some cells
   mutate(cbo_94 = str_remove(cbo_94, "^CBO"),
          cbo_02 = str_remove(cbo_02, "^CBO")
-         ) %>% 
+  ) %>% 
   #Finaly, lets trim to delete empty spaces
   mutate(across(c(cbo_94, cbo_02), str_trim)) %>% 
   #alterations on occupation measure (look only at 2-digits)
@@ -67,7 +67,7 @@ df_rais <- read_parquet("RAIS_agg.parquet") %>%
 df_rais_aux <- df_rais %>% 
   group_by(cpf) %>% 
   summarise(pis_aux = first(pis[!is.na(pis)]))
-  
+
 df_rais <- df_rais %>% 
   left_join(df_rais_aux, by="cpf", na_matches = "never") %>% 
   mutate(pis = ifelse(is.na(pis), pis_aux, pis)) %>% 
@@ -81,7 +81,7 @@ setwd(data_path)
 df_rais_age <- df_rais %>% 
   select(pis, ano, age) %>% 
   #create s column of age in 1995 that will help us in the next steps
-  mutate(age_95 = idade-(ano -1995)) %>% 
+  mutate(age_95 = age-(ano -1995)) %>% 
   #Drop individualas with inconsistent age (two or more distinct ages in 1995)
   group_by(pis) %>% 
   mutate(n_age = length(unique(age_95))) %>% 
@@ -109,7 +109,7 @@ df_rais_jobs = df_rais %>%
 
 #Get a list of pis with the characteristics we want
 pis_keep <- df_rais %>% 
-  select(pis, sexo, idade, ano) %>% 
+  select(pis, sexo, age, ano) %>% 
   #who had at most one job in each year. So we will do this in three steps
   #1) lets count how many jobs each individual had on each year
   group_by(pis, ano) %>% 
@@ -124,7 +124,7 @@ pis_keep <- df_rais %>%
   #Then chose sex
   filter(sex == sex_use) %>% 
   #With age between our choices
-  filter(idade >= min_age & idade <= max_age) %>% 
+  filter(age >= min_age & age <= max_age) %>% 
   select(pis) %>% 
   pull() %>% 
   unique()
@@ -147,7 +147,7 @@ rm(cnpj_keep)
 gc()
 
 colnames(df_firm) = c("cnpj", "ano", "n_employees_c", "mass_layoff_c", "mass_layoff_c1")
-  
+
 
 
 #################################################
@@ -168,7 +168,7 @@ for (i in (1 : length(pis_splited_list))){
   df_mini = expand_grid(pis = as.vector(pis_use),
                         baseline = (initial_year+1):(final_year-1),
                         ano = (initial_year):(final_year)
-                        )
+  )
   
   #Filter years nexto to baseline and transform pis to string
   df_mini = df_mini %>% 
@@ -183,17 +183,17 @@ for (i in (1 : length(pis_splited_list))){
   #Inpute age
   df_mini = df_mini %>% 
     left_join(df_rais_age, by = "pis", na_matches = "never") %>% 
-    mutate(idade_t = idade_95 + (ano - 1995)) %>% 
+    mutate(age_t = age_95 + (ano - 1995)) %>% 
     #filter only individuals with the age we want
-    filter(idade_t >= min_age & idade_t <= max_age) %>% 
-    select(!idade_95)
+    filter(age_t >= min_age & age_t <= max_age) %>% 
+    select(!age_95)
   
   
   #Inpute job information for year c
   df_mini = df_mini %>% 
     left_join(df_rais_baseline, by = c("pis", "baseline")) %>% 
     #filter idividuals with age we want in all the baseline periods
-    filter(idade_c >= min_age + years_prior, idade_c <= max_age - years_advance)
+    filter(age_c >= min_age + years_prior, age_c <= max_age - years_advance)
   
   
   #Filter individuals with at least 3 years of experience in the baseline year c
@@ -238,7 +238,7 @@ for (i in (1 : length(pis_splited_list))){
   #Define if a person lost his job between years c and c1
   df_mini = df_mini %>% 
     mutate(lost_job_c1 = case_when(cnpj_c == cnpj_c1 ~ 0,
-                                T ~1))
+                                   T ~1))
   
   #Create a variable indicating if a person worked in the same company of year c in the next 3 years
   df_mini = df_mini %>% 
@@ -292,13 +292,13 @@ for (i in (1 : length(pis_splited_list))){
       lost_job_c1 == 1 & !is.na(cnpj_c2) ~ cbo_94_c2,
       lost_job_c1 == 1 & !is.na(cnpj_c3) ~ cbo_94_c3,
       T ~NA)
-      ) %>% 
+    ) %>% 
     mutate(cbo_02_reemp = case_when(
       lost_job_c1 == 1 & !is.na(cnpj_c1) ~ cbo_02_c1,
       lost_job_c1 == 1 & !is.na(cnpj_c2) ~ cbo_02_c2,
       lost_job_c1 == 1 & !is.na(cnpj_c3) ~ cbo_02_c3,
       T ~NA)
-      )
+    )
   
   
   #second, define if is the same occupation
@@ -557,7 +557,7 @@ df = df %>%
   mutate(wage_bin_c = cut_width(real_wage_c, 250)) %>% 
   mutate(wage_bin_cminus1 = cut_width(real_wage_cminus1, 250)) %>% 
   mutate(wage_bin_cminus2 = cut_width(real_wage_cminus2, 250))
-  
+
 #Enforcement bins
 df = df %>% 
   mutate(enforcement_bin_c = cut_width(dist_min_m, 50))
@@ -593,7 +593,7 @@ munic_data = munic_data %>%
 low_inf = quantile(munic_data$inf_rate_m, 0.25, na.rm = T)
 mid_inf = quantile(munic_data$inf_rate_m, 0.5, na.rm = T)
 high_inf = quantile(munic_data$inf_rate_m, 0.75, na.rm = T)
-  
+
 munic_data = munic_data %>% 
   mutate(high_inf_91 = case_when(inf_rate_m >= mid_inf ~1,
                                  T ~ 0 ),
