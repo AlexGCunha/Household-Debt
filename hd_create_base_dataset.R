@@ -109,7 +109,7 @@ df_rais_jobs = df_rais %>%
 
 #Get a list of pis with the characteristics we want
 pis_keep <- df_rais %>% 
-  select(pis, sexo, age, ano) %>% 
+  select(pis, sex, age, ano) %>% 
   #who had at most one job in each year. So we will do this in three steps
   #1) lets count how many jobs each individual had on each year
   group_by(pis, ano) %>% 
