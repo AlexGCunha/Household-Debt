@@ -133,7 +133,7 @@ pis_keep <- df_rais %>%
 setwd(data_path)
 df_firm = read_parquet("firm_employment_panel.parquet")
 
-#decrease the size of df_firm by choosing firms that our full sample of individuals worked
+#decrease the size of df_firm by choosing firms that our full sample of \individuals worked
 cnpj_keep = df_rais %>% 
   filter(pis %in% pis_keep) %>% 
   select(cnpj) %>% 
