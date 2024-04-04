@@ -373,7 +373,7 @@ SELECT [MUNICIPIO] as munic
 ,[HORAS CONTR] as wk_hours
 ,[CPF] as cpf
 FROM [Depep].[dbo].[RAIS2002]
-WHERE [TP VINCL] IN ('10', '15', '20', '25', '40', '55', '80') AND
+WHERE [TP VINCL] IN ('CLT R/PJ IND', 'CLT R/PF IND', 'CLT U/PJ IND', 'CLT U/PF IND', 'APREND CONTR', 'DIRETOR', 'AVULSO') AND
 RIGHT([PIS],2)= '12'
 
 ;
@@ -381,7 +381,6 @@ RIGHT([PIS],2)= '12'
 display in smcl as text "`sql_statement'"
 odbc load, exec("`sql_statement';") dsn("Depep")
 save "\\sbcdf060\depep01$\Bernardus\Cunha_Santos_Doornik\Dta_files\RAIS_hd_02.dta", replace
-
 
 
 *****2003
