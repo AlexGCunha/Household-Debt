@@ -59,8 +59,8 @@ df_rais <- read_parquet("RAIS_agg.parquet") %>%
   #Finaly, lets trim to delete empty spaces
   mutate(across(c(cbo_94, cbo_02), str_trim)) %>% 
   #alterations on occupation measure (look only at 2-digits)
-  mutate(cbo_94 = substr(as.character(cbo_94),1,2),
-         cbo_02 = substr(as.character(cbo_02),1,2))
+  mutate(cbo_94 = substr(as.character(cbo_94), 1, 2),
+         cbo_02 = substr(as.character(cbo_02), 1, 2))
 
 #IN 2010 I dont have pis information, 
 #but we can search for it in other years
@@ -205,9 +205,9 @@ for (i in (1 : length(pis_splited_list))){
     mutate(baseline_c1 = baseline + 1,
            baseline_c2 = baseline + 2,
            baseline_c3 = baseline + 3,
-           baseline_cminus1 = baseline -1,
-           baseline_cminus2 = baseline -2,
-           baseline_cminus3 = baseline -3)
+           baseline_cminus1 = baseline - 1,
+           baseline_cminus2 = baseline - 2,
+           baseline_cminus3 = baseline - 3)
   
   df_mini = df_mini %>% 
     left_join(df_rais_jobs %>% 
