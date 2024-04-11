@@ -19,7 +19,7 @@ if (!require("ggplot2")) install.packages("splitstackshape", repos = repository)
 if (!require("readr")) install.packages("splitstackshape", repos = repository)
 if (!require("purrr")) install.packages("splitstackshape", repos = repository)
 
-# library(tidyverse)
+library(tidyverse)
 # library(haven) 
 # library(arrow)
 
@@ -146,9 +146,7 @@ df_firm = df_firm %>%
 rm(cnpj_keep)
 gc()
 
-colnames(df_firm) = c("cnpj", "ano", "n_employees_c", "mass_layoff_c", "mass_layoff_c1")
-
-
+colnames(df_firm) = c("cnpj", "ano", "n_employees_c", "mass_layoff_c1")
 
 #################################################
 #In this part, we will split our sample of pis in 100 parts and create
@@ -216,7 +214,7 @@ for (i in (1 : length(pis_splited_list))){
                 rename(baseline_c1 = ano, 
                        cnpj_c1 = cnpj, 
                        cbo_94_c1 = cbo_94,
-                       cbo_02_c1 = cbo_92),
+                       cbo_02_c1 = cbo_02),
               by = c("pis", "baseline_c1"))
   
   df_mini = df_mini %>% 
@@ -224,7 +222,7 @@ for (i in (1 : length(pis_splited_list))){
                 rename(baseline_c2 = ano, 
                        cnpj_c2 = cnpj, 
                        cbo_94_c2 = cbo_94,
-                       cbo_02_c2 = cbo_92),
+                       cbo_02_c2 = cbo_02),
               by = c("pis", "baseline_c2"))
   
   df_mini = df_mini %>% 
@@ -232,7 +230,7 @@ for (i in (1 : length(pis_splited_list))){
                 rename(baseline_c3 = ano, 
                        cnpj_c3 = cnpj, 
                        cbo_94_c3 = cbo_94,
-                       cbo_02_c3 = cbo_92),
+                       cbo_02_c3 = cbo_02),
               by = c("pis", "baseline_c3"))
   
   #Define if a person lost his job between years c and c1
@@ -254,10 +252,29 @@ for (i in (1 : length(pis_splited_list))){
                                          !is.na(cnpj_c3) ~ 1,
                                        T ~ 0 ))
   
+  #change df_firm column names to join
+  df_firm = df_firm %>% 
+    rename(cnpj_c = cnpj,
+           baseline_c1 = ano)
+  
   #Inpute mass layoff (at year c1)
-  df_mini = df_mini %>% 
-    left_join(df_firm %>% select(!n_employees_c), join_by(cnpj_c == cnpj,
-                                                          baseline_c1 == ano))
+  df_mini <- df_mini %>% 
+    left_join(df_firm %>% select(!n_employees_c), 
+              by = c("cnpj_c", "baseline_c1"))
+  
+  #change df_firm column names for the next join
+  df_firm = df_firm %>% 
+    rename(baseline_c = baseline_c1)
+  
+  #Inpute # of employees (at baseline year)
+  df_mini <- df_mini %>% 
+    left_join(df_firm %>% select(!mass_layoff_c1), 
+              by = c("cnpj_c", "baseline_c"))
+  
+  #change back df_firm column names
+  df_firm = df_firm %>% 
+    rename(cnpj = cnpj_c, 
+           ano = baseline_c)
   
   #Filter plants with the minimum number of employees required
   df_mini = df_mini %>% 
