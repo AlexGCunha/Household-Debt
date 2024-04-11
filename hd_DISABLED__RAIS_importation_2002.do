@@ -1,6 +1,6 @@
 /*
 
-This Do file will download  RAIS data from TERADATA for 2002
+DISABLED! This Do file will download  RAIS data from TERADATA for 2002
 
 */
 
