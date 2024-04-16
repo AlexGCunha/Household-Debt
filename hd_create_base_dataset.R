@@ -264,17 +264,17 @@ for (i in (1 : length(pis_splited_list))){
   
   #change df_firm column names for the next join
   df_firm = df_firm %>% 
-    rename(baseline_c = baseline_c1)
+    rename(baseline = baseline_c1)
   
   #Inpute # of employees (at baseline year)
   df_mini <- df_mini %>% 
     left_join(df_firm %>% select(!mass_layoff_c1), 
-              by = c("cnpj_c", "baseline_c"))
+              by = c("cnpj_c", "baseline"))
   
   #change back df_firm column names
   df_firm = df_firm %>% 
     rename(cnpj = cnpj_c, 
-           ano = baseline_c)
+           ano = baseline)
   
   #Filter plants with the minimum number of employees required
   df_mini = df_mini %>% 
