@@ -25,7 +25,7 @@ FROM
 WHERE 
   tableLoans.TPC_CD = 1 AND
   tableLoans.MEE_CD_MES > 199501 AND
-  RIGHT(tableLoans.CLI_CD,2)= '12'
+  RIGHT(LTRIM(RTRIM(tableLoans.CLI_CD)),2)= '12'
 GROUP BY 
   tableLoans.MEE_CD_MES, 
   tableLoans.CLI_CD
@@ -56,7 +56,7 @@ WHERE
   ((tableLoans.DMO_CD BETWEEN 200 AND 299) OR
   (tableLoans.DMO_CD BETWEEN 400 AND 499)) AND
   tableLoans.MEE_CD_MES > 199501 AND
-  RIGHT(tableLoans.CLI_CD,2)= '12'
+  RIGHT(LTRIM(RTRIM(tableLoans.CLI_CD)),2)= '12'
 GROUP BY 
   tableLoans.MEE_CD_MES, 
   tableLoans.CLI_CD
@@ -80,7 +80,7 @@ SELECT
 FROM 
   MTDWPRO_ACC.EMTTB_FCP_FATO_CPF_PIS
 WHERE
-  RIGHT(CPF_CD,2) = '12'
+  RIGHT(LTRIM(RTRIM(CPF_CD)),2) = '12'
 GROUP BY 
   CPF_CD
 ;

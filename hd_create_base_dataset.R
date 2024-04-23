@@ -158,7 +158,7 @@ pis_splited_list = split(pis_keep, ceiling(seq_along(pis_keep)/(length(pis_keep)
 count_aux = 0
 a = Sys.time()
 
-for (i in (1 : length(pis_splited_list))){
+for (i in seq_along(pis_splited_list)){
   gc()
   pis_use = pis_splited_list[[i]]
   
