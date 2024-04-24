@@ -282,7 +282,7 @@ for (i in seq_along(pis_splited_list)){
   
   #Inpute wage and employment information at year t
   df_mini = df_mini %>% 
-    left_join(df_rais %>% select(pis, ano, wage_dec_sm, cpnj) %>% rename(wage_dec_sm_t = wage_dec_sm,
+    left_join(df_rais %>% select(pis, ano, wage_dec_sm, cnpj) %>% rename(wage_dec_sm_t = wage_dec_sm,
                                                                          cnpj_t = cnpj),
               by = c("pis", "ano")) %>% 
     mutate(worked_t = case_when(!is.na(cnpj_t) ~ 1,

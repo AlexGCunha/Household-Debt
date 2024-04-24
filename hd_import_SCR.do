@@ -75,8 +75,8 @@ clear
 
 local sql_statement
 SELECT 
-  CPF_CD,
-  MAX(FCP_PIS) AS FCP_PIS
+  CPF_CD as cpf,
+  MAX(FCP_PIS) AS pis
 FROM 
   MTDWPRO_ACC.EMTTB_FCP_FATO_CPF_PIS
 WHERE
