@@ -308,13 +308,13 @@ for (i in seq_along(pis_splited_list)){
       lost_job_c1 == 1 & !is.na(cnpj_c1) ~ cbo_94_c1,
       lost_job_c1 == 1 & !is.na(cnpj_c2) ~ cbo_94_c2,
       lost_job_c1 == 1 & !is.na(cnpj_c3) ~ cbo_94_c3,
-      T ~NA)
+      T ~ NA_character_)
     ) %>% 
     mutate(cbo_02_reemp = case_when(
       lost_job_c1 == 1 & !is.na(cnpj_c1) ~ cbo_02_c1,
       lost_job_c1 == 1 & !is.na(cnpj_c2) ~ cbo_02_c2,
       lost_job_c1 == 1 & !is.na(cnpj_c3) ~ cbo_02_c3,
-      T ~NA)
+      T ~ NA_character_)
     )
   
   
