@@ -320,7 +320,7 @@ for (i in seq_along(pis_splited_list)){
   
   #second, define if is the same occupation
   df_mini = df_mini %>% 
-    mutate(reemp_same_occup = case_when(cbo_94_reemp == cbo_94_c | cbo_02_reemp == cbo_02 ~ 1,
+    mutate(reemp_same_occup = case_when(cbo_94_reemp == cbo_94_c | cbo_02_reemp == cbo_02_c ~ 1,
                                         T ~0))
   
   #drop no longer used columns
@@ -341,8 +341,8 @@ for (i in seq_along(pis_splited_list)){
 }
 
 b = Sys.time()
-print(paste0("time to create mini DFs: ", (b-a)))
-rm(df_firm, df_plant, df_mini, df_rais, df_rais_age, df_rais_baseline, df_rais_jobs)
+print(b-a)
+rm(df_firm, df_mini, df_rais, df_rais_age, df_rais_baseline, df_rais_jobs)
 
 Sys.sleep(60)
 gc()
@@ -352,9 +352,12 @@ gc()
 ##########################
 #Additional informations
 ##########################
+#some summary statistics
+print(str(df))
+print(summary(df))
 
 #Correct data types for memory purposes
-df = df %>% 
+df <- df %>% 
   mutate_at(c(age_t, emp_time_c, munic_c, lost_job_c1, 
               n_empoyees_c, lost_job_mass_layoff_c1), as.integer)
 
@@ -655,6 +658,8 @@ setwd(data_path)
 write_parquet(df, "sample_complete_information.parquet")
 
 print(str(df))
+
+print(summary(df))
 
 fin_time = Sys.time()
 print(paste0("Tempo para rodar este código:", (fin_time - ini_time)))
