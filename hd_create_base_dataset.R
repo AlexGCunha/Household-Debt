@@ -359,7 +359,7 @@ print(summary(df))
 #Correct data types for memory purposes
 df <- df %>% 
   mutate_at(c("age_t", "emp_time_c", "munic_c", "lost_job_c1", 
-              "n_empoyees_c", "lost_job_mass_layoff_c1"), as.integer)
+              "n_employees_c", "lost_job_mass_layoff_c1"), as.integer)
 
 gc()
 
