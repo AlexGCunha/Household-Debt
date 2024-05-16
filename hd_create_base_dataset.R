@@ -368,6 +368,8 @@ gc()
 setwd(data_path)
 df_gdp_t = read_parquet("munic_data.parquet")
 
+print(colnames(df_gdp_t))
+
 df_gdp_t = df_gdp_t %>% 
   rename(employed_m = empregado_m,
          inf_rate_m = taxa_informal_m,
