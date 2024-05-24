@@ -394,7 +394,7 @@ df_enf = read_parquet("Distances_munic.parquet") %>%
          dist_min_m = dist_min) %>% 
   mutate(munic_c = substr(as.character(munic_c),1,6)) %>% 
   select(munic_c, dist_min_m) %>% 
-  mutate_all(integer)
+  mutate_all(as.integer)
 
 #merge by municipality
 df = df %>% 
