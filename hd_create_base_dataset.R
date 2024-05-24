@@ -384,7 +384,7 @@ df_gdp_t = df_gdp_t %>%
   mutate_at(c("munic_c", "ano"), as.integer)
 
 #merge by year and municipality
-df - df %>% 
+df = df %>% 
   left_join(df_gdp_t, by = c( "ano", "munic_c"))
 
 #Add enforcement data at the municipality level
