@@ -18,10 +18,10 @@ if (!require("tidyr")) install.packages("splitstackshape", repos = repository)
 if (!require("ggplot2")) install.packages("splitstackshape", repos = repository)
 if (!require("readr")) install.packages("splitstackshape", repos = repository)
 if (!require("purrr")) install.packages("splitstackshape", repos = repository)
+if (!require("readxl")) install.packages("splitstackshape", repos = repository)
 
 library(tidyverse)
-# library(haven) 
-# library(arrow)
+library(readxl)
 
 data_path = "Z:/Bernardus/Cunha_Santos_Doornik/Dta_files"
 output_path = "Z:/Bernardus/Cunha_Santos_Doornik/Output_check"
