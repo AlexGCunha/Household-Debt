@@ -619,7 +619,7 @@ high_inf = quantile(munic_data$inf_rate_m, 0.75, na.rm = T)
 munic_data = munic_data %>% 
   mutate(high_inf_91 = case_when(inf_rate_m >= mid_inf ~1,
                                  T ~ 0 ),
-         low_inf_91 = 1 - alta_inf) %>% 
+         low_inf_91 = 1 - high_inf_91) %>% 
   rename(munic_c = munic,
          inf_rate_91_m = inf_rate_m)
 
@@ -643,8 +643,8 @@ df = df %>%
 
 #Define 1 and 2-digit cnae (industry sector)
 df = df %>% 
-  mutate(cnae2_c = substr(as.character(cnar_c),1,2),
-         cnae_c = substr(as.character(cnar_c),1,1))
+  mutate(cnae2_c = substr(as.character(cnae_c),1,2),
+         cnae_c = substr(as.character(cnae_c),1,1))
 
 #year/cnae/munic FE
 df = df %>% 
@@ -653,7 +653,7 @@ df = df %>%
 #Reorder columns alphabetically, but with some chosen ones appearing first
 df = df %>% 
   select(sort(colnames(.))) %>% 
-  select(pis, baseline, ano, ano_relative_cohort, everything())
+  select(pis, baseline, ano, ano_relative_baseline, everything())
 
 #Save
 setwd(data_path)
@@ -664,7 +664,7 @@ print(str(df))
 print(summary(df))
 
 fin_time = Sys.time()
-print(paste0("Tempo para rodar este código:", (fin_time - ini_time)))
+print(paste0("Tempo para rodar este código:", (fin_time - init_time)))
 
 rm(list = ls())
 
