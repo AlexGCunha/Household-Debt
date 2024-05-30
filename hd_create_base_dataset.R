@@ -590,7 +590,7 @@ df= df %>%
 
 #Get additional information for the year the person lost her job (c1)
 df = df %>% 
-  group_by(pis, cohort) %>% 
+  group_by(pis, baseline) %>% 
   mutate(var_gdp_m_c = var_gdp_m_t[ano_relative_baseline==0],
          var_gdp_m_c1 = var_gdp_m_t[ano_relative_baseline == 1],
          unemp_rate_m_c1 = umep_rate_m_t[ano_relative_baseline == 1],
