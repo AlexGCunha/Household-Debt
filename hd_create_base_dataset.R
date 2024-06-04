@@ -593,7 +593,7 @@ df = df %>%
   group_by(pis, baseline) %>% 
   mutate(var_gdp_m_c = var_gdp_m_t[ano_relative_baseline==0],
          var_gdp_m_c1 = var_gdp_m_t[ano_relative_baseline == 1],
-         unemp_rate_m_c1 = umep_rate_m_t[ano_relative_baseline == 1],
+         unemp_rate_m_c1 = unemp_rate_m_t[ano_relative_baseline == 1],
          inf_rate_m_c1 = inf_rate_m_t[ano_relative_baseline == 1]) %>% 
   ungroup()
 
@@ -664,7 +664,7 @@ print(str(df))
 print(summary(df))
 
 fin_time = Sys.time()
-print(paste0("Tempo para rodar este código:", (fin_time - init_time)))
+print((fin_time - init_time))
 
 rm(list = ls())
 
