@@ -107,6 +107,9 @@ df_rais_baseline <- df_rais %>%
 df_rais_jobs = df_rais %>% 
   select(cnpj, ano, pis, cbo_94, cbo_02)
 
+#Get information about the highest 1% wages to trim in the next step
+max_wage = quantile(rais$wage_dec_sm, 0.99)
+
 #Get a list of pis with the characteristics we want
 pis_keep <- df_rais %>% 
   select(pis, sex, age, ano) %>% 
@@ -121,6 +124,12 @@ pis_keep <- df_rais %>%
   ungroup() %>% 
   #3) Filter out these people
   filter(mais_um_emprego_qualquer_ano <=1) %>% 
+  #Trim by wage and filter unreasonable employment time (more than 35 years)
+  group_by(pis) %>% 
+  mutate(indicator_wage = ifelse(max(wage_dec_sm, na.rm = T) > max_wage, 1,0),
+         indicator_work = ifelse(max(emp_time, na.rm = T) > (35*12), 1,0)) %>% 
+  ungroup() %>% 
+  filter(indicator_wage == 0 & indicator_work == 0) %>% 
   #Then chose sex
   filter(sex == sex_use) %>% 
   #With age between our choices
@@ -282,8 +291,9 @@ for (i in seq_along(pis_splited_list)){
   
   #Inpute wage and employment information at year t
   df_mini = df_mini %>% 
-    left_join(df_rais %>% select(pis, ano, wage_dec_sm, cnpj) %>% rename(wage_dec_sm_t = wage_dec_sm,
-                                                                         cnpj_t = cnpj),
+    left_join(df_rais %>% select(pis, ano, wage_dec_sm, cnpj) %>%
+                rename(wage_dec_sm_t = wage_dec_sm, 
+                       cnpj_t = cnpj),
               by = c("pis", "ano")) %>% 
     mutate(worked_t = case_when(!is.na(cnpj_t) ~ 1,
                                 T ~ 0))
@@ -339,6 +349,7 @@ for (i in seq_along(pis_splited_list)){
   }
   
 }
+
 
 b = Sys.time()
 print(b-a)
@@ -657,11 +668,12 @@ df = df %>%
 
 #Save
 setwd(data_path)
-write_parquet(df, "sample_complete_information.parquet")
 
 print(str(df))
 
 print(summary(df))
+
+write_parquet(df, "sample_complete_information.parquet")
 
 fin_time = Sys.time()
 print((fin_time - init_time))
