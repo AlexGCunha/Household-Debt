@@ -45,7 +45,7 @@ clean_scr = function(df){
   #take data only in December
   df = df %>% 
     mutate(ano = substr(time_id, 1, 4),
-           mes = substr(time_id), nchar(time_id)-2 + 1, nchar(time_id)) %>% 
+           mes = substr(time_id), nchar(time_id)-1, nchar(time_id)) %>% 
     mutate(across(c("ano", "mes"), as.integer)) %>% 
     filter(mes == 12) %>% 
     select(!c("mes", "time_id"))
@@ -120,9 +120,12 @@ rais = rais %>%
 #Save
 setwd(data_path)
 write_parquet(rais, "data_before_matching.parquet")
+print(summary(rais))
 
 final_time = Sys.time()
-print(final_time - init_time)
+print(paste0("Time to run: ", 
+             round(difftime(final_time, init_time, units = 'mins')), 
+             ' mins'))
 rm(list = ls())
 gc()
 

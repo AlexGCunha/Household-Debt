@@ -73,6 +73,14 @@ df_rais <- df_rais %>%
   mutate(pis = ifelse(is.na(pis), pis_aux, pis)) %>% 
   select(!pis_aux, cpf)
 
+#Now that we have pis info for 2010, lets filter values in our sample
+#that is, pis ended in '12'
+df_rais = df_rais %>% 
+  mutate(nchar_pis = nchar(pis),
+         last_char_pis = substr(pis, nchar_pis - 1, nchar_pis)) %>% 
+  filter(last_char_pis == 12) %>% 
+  select(!c(last_char_pis, nchar_pis))
+
 rm(df_rais_aux)
 gc()
 
@@ -108,11 +116,11 @@ df_rais_jobs = df_rais %>%
   select(cnpj, ano, pis, cbo_94, cbo_02)
 
 #Get information about the highest 1% wages to trim in the next step
-max_wage = quantile(rais$wage_dec_sm, 0.99)
+max_wage = quantile(df_rais$wage_dec_sm, 0.97)
 
 #Get a list of pis with the characteristics we want
 pis_keep <- df_rais %>% 
-  select(pis, sex, age, ano) %>% 
+  select(pis, sex, age, ano, wage_dec_sm, emp_time) %>% 
   #who had at most one job in each year. So we will do this in three steps
   #1) lets count how many jobs each individual had on each year
   group_by(pis, ano) %>% 
