@@ -1,4 +1,8 @@
 #------------------------------------------------------------------------------------------------------------------------------
+#DESCONTINUADO
+
+
+
 #This code will:
 #- Create baseline dataset
 #- This dataset will be a panel of individuals by year/baseline year
@@ -65,8 +69,10 @@ df_rais <- read_parquet("RAIS_agg.parquet") %>%
 #IN 2010 I dont have pis information, 
 #but we can search for it in other years
 df_rais_aux <- df_rais %>% 
+  filter(!is.na(cpf), !is.na(pis)) %>% 
   group_by(cpf) %>% 
-  summarise(pis_aux = first(pis[!is.na(pis)]))
+  summarise(pis_aux = first(pis[!is.na(pis)])) %>% 
+  ungroup()
 
 df_rais <- df_rais %>% 
   left_join(df_rais_aux, by="cpf", na_matches = "never") %>% 
@@ -78,11 +84,26 @@ df_rais <- df_rais %>%
 df_rais = df_rais %>% 
   mutate(nchar_pis = nchar(pis),
          last_char_pis = substr(pis, nchar_pis - 1, nchar_pis)) %>% 
-  filter(last_char_pis == 12) %>% 
+  filter(last_char_pis == "12") %>% 
   select(!c(last_char_pis, nchar_pis))
 
 rm(df_rais_aux)
 gc()
+
+#Print number of individuals per year until now
+pis_year = df_rais %>% 
+  select(pis, ano) %>% 
+  group_by(ano) %>% 
+  summarise(n_pis = n()) %>% 
+  ungroup()
+
+for (ano_aux in sort(unique(pis_year$ano))){
+  workers_year = pis_year$n_pis[pis_year$ano == ano_aux]
+  message = paste0('Workers in ', ano_aux, ': ', workers_year)
+  print(message)
+}
+
+rm(ano_aux, pis_year)
 
 #Get information in 1995 (could be in any year) for all workers
 setwd(data_path)
@@ -145,6 +166,23 @@ pis_keep <- df_rais %>%
   select(pis) %>% 
   pull() %>% 
   unique()
+
+#Print number of individuals per year until now
+pis_year = df_rais %>% 
+  select(pis, ano) %>% 
+  filter(pis %in% pis_keep) %>% 
+  group_by(ano) %>% 
+  summarise(n_pis = n()) %>% 
+  ungroup()
+
+for (ano_aux in sort(unique(df_rais$ano))){
+  workers_year = df_rais$n_pis[df_rais$ano == ano_aux]
+  message = paste0('Workers in ', ano_aux, ': ', workers_year)
+  print(message)
+}
+
+rm(ano_aux, pis_year)
+
 
 #Get information of # of employees on the firm and the plant level, per year
 setwd(data_path)

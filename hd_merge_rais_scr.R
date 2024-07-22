@@ -1,4 +1,8 @@
 #------------------------------------------------------------------------------------------------------------------------------
+# DESCONTINUADO
+
+
+
 #This code will:
 #- Work on individual SCR data downloaded from TERADATA
 #- Merge with RAIS data worked in the previous codes
@@ -79,6 +83,17 @@ rais = rais %>%
 
 rm(scr_loans, pis_cpf)
 gc()
+
+
+
+############SÓ LEVEI PARA O OUTRO CODIGO ATE AQUI
+
+
+
+
+
+
+
 
 #Define debt level at baseline year c
 rais = rais %>% 

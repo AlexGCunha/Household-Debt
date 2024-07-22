@@ -34,7 +34,7 @@ SELECT [Município] as munic
 ,[Vl Remun Dezembro (SM)] as wage_dec_sm
 FROM [Depep].[dbo].[RAIS1992]
 WHERE [Tipo Vínculo] IN ('10', '15', '20', '25', '40', '55', '80') AND
-RIGHT([PIS],2)= '12'
+CAST([Vínculo Ativo 31 12] AS int) = 1
 
 ;
 #delimit cr
@@ -64,7 +64,7 @@ SELECT [Município] as munic
 ,[Vl Remun Dezembro (SM)] as wage_dec_sm
 FROM [Depep].[dbo].[RAIS1993]
 WHERE [Tipo Vínculo] IN ('10', '15', '20', '25', '40', '55', '80') AND
-RIGHT([PIS],2)= '12'
+CAST([Vínculo Ativo 31 12] AS int) = 1
 
 ;
 #delimit cr
@@ -97,7 +97,7 @@ SELECT [Município] as munic
 ,[Qtd Hora Contr] as wk_hours
 FROM [Depep].[dbo].[RAIS1994]
 WHERE [Tipo Vínculo] IN ('10', '15', '20', '25', '40', '55', '80') AND
-RIGHT([PIS],2)= '12'
+CAST([Vínculo Ativo 31 12] AS int) = 1
 
 ;
 #delimit cr
@@ -131,7 +131,7 @@ SELECT [Município] as munic
 ,[Qtd Hora Contr] as wk_hours
 FROM [Depep].[dbo].[RAIS1995]
 WHERE [Tipo Vínculo] IN ('10', '15', '20', '25', '40', '55', '80') AND
-RIGHT([PIS],2)= '12'
+CAST([Vínculo Ativo 31 12] AS int) = 1
 
 ;
 #delimit cr
@@ -165,7 +165,7 @@ SELECT [Município] as munic
 ,[Qtd Hora Contr] as wk_hours
 FROM [Depep].[dbo].[RAIS1996]
 WHERE [Tipo Vínculo] IN ('10', '15', '20', '25', '40', '55', '80') AND
-RIGHT([PIS],2)= '12'
+CAST([Vínculo Ativo 31 12] AS int) = 1
 
 ;
 #delimit cr
@@ -199,7 +199,7 @@ SELECT [Município] as munic
 ,[Qtd Hora Contr] as wk_hours
 FROM [Depep].[dbo].[RAIS1997]
 WHERE [Tipo Vínculo] IN ('10', '15', '20', '25', '40', '55', '80') AND
-RIGHT([PIS],2)= '12'
+CAST([Vínculo Ativo 31 12] AS int) = 1
 
 ;
 #delimit cr
@@ -233,7 +233,7 @@ SELECT [Município] as munic
 ,[Qtd Hora Contr] as wk_hours
 FROM [Depep].[dbo].[RAIS1998]
 WHERE [Tipo Vínculo] IN ('10', '15', '20', '25', '40', '55', '80') AND
-RIGHT([PIS],2)= '12'
+CAST([Vínculo Ativo 31 12] AS int) = 1
 
 ;
 #delimit cr
@@ -268,7 +268,7 @@ SELECT [Município] as munic
 ,[Qtd Hora Contr] as wk_hours
 FROM [Depep].[dbo].[RAIS1999]
 WHERE [Tipo Vínculo] IN ('10', '15', '20', '25', '40', '55', '80') AND
-RIGHT([PIS],2)= '12'
+CAST([Vínculo Ativo 31 12] AS int) = 1
 
 ;
 #delimit cr
@@ -303,7 +303,7 @@ SELECT [Município] as munic
 ,[Qtd Hora Contr] as wk_hours
 FROM [Depep].[dbo].[RAIS2000]
 WHERE [Tipo Vínculo] IN ('10', '15', '20', '25', '40', '55', '80') AND
-RIGHT([PIS],2)= '12'
+CAST([Vínculo Ativo 31 12] AS int) = 1
 
 ;
 #delimit cr
@@ -338,7 +338,7 @@ SELECT [Município] as munic
 ,[Qtd Hora Contr] as wk_hours
 FROM [Depep].[dbo].[RAIS2001]
 WHERE [Tipo Vínculo] IN ('10', '15', '20', '25', '40', '55', '80') AND
-RIGHT([PIS],2)= '12'
+CAST([Vínculo Ativo 31 12] AS int) = 1
 
 ;
 #delimit cr
@@ -374,7 +374,7 @@ SELECT [MUNICIPIO] as munic
 ,[CPF] as cpf
 FROM [Depep].[dbo].[RAIS2002]
 WHERE [TP VINCL] IN ('CLT R/PJ IND', 'CLT R/PF IND', 'CLT U/PJ IND', 'CLT U/PF IND', 'APREND CONTR', 'DIRETOR', 'AVULSO') AND
-RIGHT([PIS],2)= '12'
+CAST([EMP EM 31 12] AS int) = 1
 
 ;
 #delimit cr
@@ -411,7 +411,7 @@ SELECT [MUNICIPIO] as munic
 ,[OCUP 2002] as cbo_02
 FROM [Depep].[dbo].[RAIS2003]
 WHERE [TP VINCULO] IN ('10', '15', '20', '25', '40', '55', '80') AND
-RIGHT([PIS],2)= '12'
+CAST([EMP EM 31 12] AS int) = 1
 
 ;
 #delimit cr
@@ -449,7 +449,7 @@ SELECT [MUNICIPIO] as munic
 ,[OCUP 2002] as cbo_02
 FROM [Depep].[dbo].[RAIS2004]
 WHERE [TP VINCULO] IN ('10', '15', '20', '25', '40', '55', '80') AND
-RIGHT([PIS],2)= '12'
+CAST([EMP EM 31 12] AS int) = 1
 
 
 ;
@@ -488,7 +488,7 @@ SELECT [MUNICIPIO] as munic
 ,[OCUP 2002] as cbo_02
 FROM [Depep].[dbo].[RAIS2005]
 WHERE [TP VINCULO] IN ('10', '15', '20', '25', '40', '55', '80') AND
-RIGHT([PIS],2)= '12'
+CAST([EMP EM 31 12] AS int) = 1
 
 
 ;
@@ -527,7 +527,7 @@ SELECT [MUNICIPIO] as munic
 ,[OCUP 2002] as cbo_02
 FROM [Depep].[dbo].[RAIS2006]
 WHERE [TP VINCULO] IN ('10', '15', '20', '25', '40', '55', '80') AND
-RIGHT([PIS],2)= '12'
+CAST([EMP EM 31 12] AS int) = 1
 
 
 ;
@@ -566,7 +566,7 @@ SELECT [MUNICIPIO] as munic
 ,[OCUP 2002] as cbo_02
 FROM [Depep].[dbo].[RAIS2007]
 WHERE [TP VINCULO] IN ('10', '15', '20', '25', '40', '55', '80') AND
-RIGHT([PIS],2)= '12'
+CAST([EMP EM 31 12] AS int) = 1
 
 
 ;
@@ -605,7 +605,7 @@ SELECT [MUNICIPIO] as munic
 ,[OCUP 2002] as cbo_02
 FROM [Depep].[dbo].[RAIS2008]
 WHERE [TP VINCULO] IN ('10', '15', '20', '25', '40', '55', '80') AND
-RIGHT([PIS],2)= '12'
+CAST([EMP EM 31 12] AS int) = 1
 
 
 ;
@@ -644,7 +644,7 @@ SELECT [MUNICIPIO] as munic
 ,[OCUP 2002] as cbo_02
 FROM [Depep].[dbo].[RAIS2009]
 WHERE [TP VINCULO] IN ('10', '15', '20', '25', '40', '55', '80') AND
-RIGHT([PIS],2)= '12'
+CAST([EMP EM 31 12] AS int) = 1
 
 
 ;
@@ -681,7 +681,8 @@ SELECT [MUNICIPIO] as munic
 ,[CPF] as cpf
 ,[OCUP 2002] as cbo_02
 FROM [Depep].[dbo].[RAIS2010]
-WHERE [TP VINCULO] IN ('10', '15', '20', '25', '40', '55', '80')
+WHERE [TP VINCULO] IN ('10', '15', '20', '25', '40', '55', '80') AND
+CAST([EMP EM 31 12] AS int) = 1
 
 
 ;
@@ -719,7 +720,7 @@ SELECT [Município] as munic
 ,[CBO Ocupação 2002] as cbo_02
 FROM [Depep].[dbo].[RAIS2011]
 WHERE [Tipo Vínculo] IN ('10', '15', '20', '25', '40', '55', '80') AND
-RIGHT([PIS],2)= '12'
+CAST([Vínculo Ativo 31 12] AS int) = 1
 
 
 ;
@@ -757,7 +758,7 @@ SELECT [Município] as munic
 ,[CBO Ocupação 2002] as cbo_02
 FROM [Depep].[dbo].[RAIS2012]
 WHERE [Tipo Vínculo] IN ('10', '15', '20', '25', '40', '55', '80') AND
-RIGHT([PIS],2)= '12'
+CAST([Vínculo Ativo 31 12] AS int) = 1
 
 ;
 #delimit cr
@@ -795,7 +796,7 @@ SELECT [Município] as munic
 ,[idade] as age
 FROM [Depep].[dbo].[RAIS2013]
 WHERE [Tipo Vínculo] IN ('10', '15', '20', '25', '40', '55', '80') AND
-RIGHT([PIS],2)= '12'
+CAST([Vínculo Ativo 31 12] AS int) = 1
 
 ;
 #delimit cr
@@ -834,7 +835,7 @@ SELECT [Município] as munic
 ,[Data de Nascimento] as born_date
 FROM [Depep].[dbo].[RAIS2014]
 WHERE [Tipo Vínculo] IN ('10', '15', '20', '25', '40', '55', '80') AND
-RIGHT([PIS],2)= '12'
+CAST([Vínculo Ativo 31 12] AS int) = 1
 
 ;
 #delimit cr
@@ -873,7 +874,7 @@ SELECT [Município] as munic
 ,[Data de Nascimento] as born_date
 FROM [Depep].[dbo].[RAIS2015]
 WHERE [Tipo Vínculo] IN ('10', '15', '20', '25', '40', '55', '80') AND
-RIGHT([PIS],2)= '12'
+CAST([Vínculo Ativo 31 12] AS int) = 1
 
 ;
 #delimit cr
@@ -912,7 +913,7 @@ SELECT [municipio] as munic
 ,[datadenascimento] as born_date
 FROM [Depep].[dbo].[RAIS2016]
 WHERE [tipovinculo] IN ('10', '15', '20', '25', '40', '55', '80') AND
-RIGHT([pis],2)= '12'
+CAST([vinculoativo3112] AS int) = 1
 
 ;
 #delimit cr
@@ -951,7 +952,7 @@ SELECT [municipio] as munic
 ,[datadenascimento] as born_date
 FROM [Depep].[dbo].[RAIS2017]
 WHERE [tipovinculo] IN ('10', '15', '20', '25', '40', '55', '80') AND
-RIGHT([pis],2)= '12'
+CAST([vinculoativo3112] AS int) = 1
 
 ;
 #delimit cr
@@ -990,7 +991,7 @@ SELECT [municipio] as munic
 ,[datadenascimento] as born_date
 FROM [Depep].[dbo].[RAIS2018]
 WHERE [tipovinculo] IN ('10', '15', '20', '25', '40', '55', '80') AND
-RIGHT([pis],2)= '12'
+CAST([vinculoativo3112] AS int) = 1
 
 ;
 #delimit cr
@@ -1029,7 +1030,7 @@ SELECT [municipio] as munic
 ,[datadenascimento] as born_date
 FROM [Depep].[dbo].[RAIS2019]
 WHERE [tipovinculo] IN ('10', '15', '20', '25', '40', '55', '80') AND
-RIGHT([pis],2)= '12'
+CAST([vinculoativo3112] AS int) = 1
 
 ;
 #delimit cr
@@ -1069,7 +1070,7 @@ SELECT  [municipio] as munic
 FROM [Depep].[dbo].[RAIS2020]
 WHERE 
 [tipovinculo] IN ('10', '15', '20', '25', '40', '55', '80') AND
-RIGHT([pis],2)= '12'
+CAST([vinculoativo3112] AS int) = 1
 
 ;
 #delimit cr
@@ -1108,7 +1109,7 @@ SELECT [municipio] as munic
 ,[datadenascimento] as born_date
 FROM [Depep].[dbo].[RAIS2021]
 WHERE [tipovinculo] IN ('10', '15', '20', '25', '40', '55', '80') AND
-RIGHT([pis],2)= '12'
+CAST([vinculoativo3112] AS int) = 1
 
 ;
 #delimit cr
