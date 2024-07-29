@@ -27,7 +27,7 @@ GROUP BY [CNPJ Raiz]
 #delimit cr
 display in smcl as text "`sql_statement'"
 odbc load, exec("`sql_statement';") dsn("Depep")
-save "\\sbcdf060\depep01$\Bernardus\Cunha_Santos_Doornik\Dta_files\RAIS_firm_94.dta", replace
+save "\\sbcdf060\depep02$\Bernardus\Cunha_Santos_Doornik\Dta_files\RAIS_firm_94.dta", replace
 
 
 
@@ -47,7 +47,7 @@ GROUP BY [CNPJ Raiz]
 #delimit cr
 display in smcl as text "`sql_statement'"
 odbc load, exec("`sql_statement';") dsn("Depep")
-save "\\sbcdf060\depep01$\Bernardus\Cunha_Santos_Doornik\Dta_files\RAIS_firm_95.dta", replace
+save "\\sbcdf060\depep02$\Bernardus\Cunha_Santos_Doornik\Dta_files\RAIS_firm_95.dta", replace
 
 
 
@@ -67,7 +67,7 @@ GROUP BY [CNPJ Raiz]
 #delimit cr
 display in smcl as text "`sql_statement'"
 odbc load, exec("`sql_statement';") dsn("Depep")
-save "\\sbcdf060\depep01$\Bernardus\Cunha_Santos_Doornik\Dta_files\RAIS_firm_96.dta", replace
+save "\\sbcdf060\depep02$\Bernardus\Cunha_Santos_Doornik\Dta_files\RAIS_firm_96.dta", replace
 
 
 
@@ -87,7 +87,7 @@ GROUP BY [CNPJ Raiz]
 #delimit cr
 display in smcl as text "`sql_statement'"
 odbc load, exec("`sql_statement';") dsn("Depep")
-save "\\sbcdf060\depep01$\Bernardus\Cunha_Santos_Doornik\Dta_files\RAIS_firm_97.dta", replace
+save "\\sbcdf060\depep02$\Bernardus\Cunha_Santos_Doornik\Dta_files\RAIS_firm_97.dta", replace
 
 
 
@@ -107,7 +107,7 @@ GROUP BY [CNPJ Raiz]
 #delimit cr
 display in smcl as text "`sql_statement'"
 odbc load, exec("`sql_statement';") dsn("Depep")
-save "\\sbcdf060\depep01$\Bernardus\Cunha_Santos_Doornik\Dta_files\RAIS_firm_98.dta", replace
+save "\\sbcdf060\depep02$\Bernardus\Cunha_Santos_Doornik\Dta_files\RAIS_firm_98.dta", replace
 
 
 
@@ -127,7 +127,7 @@ GROUP BY [CNPJ Raiz]
 #delimit cr
 display in smcl as text "`sql_statement'"
 odbc load, exec("`sql_statement';") dsn("Depep")
-save "\\sbcdf060\depep01$\Bernardus\Cunha_Santos_Doornik\Dta_files\RAIS_firm_99.dta", replace
+save "\\sbcdf060\depep02$\Bernardus\Cunha_Santos_Doornik\Dta_files\RAIS_firm_99.dta", replace
 
 
 
@@ -147,7 +147,7 @@ GROUP BY [CNPJ Raiz]
 #delimit cr
 display in smcl as text "`sql_statement'"
 odbc load, exec("`sql_statement';") dsn("Depep")
-save "\\sbcdf060\depep01$\Bernardus\Cunha_Santos_Doornik\Dta_files\RAIS_firm_00.dta", replace
+save "\\sbcdf060\depep02$\Bernardus\Cunha_Santos_Doornik\Dta_files\RAIS_firm_00.dta", replace
 
 
 
@@ -167,7 +167,7 @@ GROUP BY [CNPJ Raiz]
 #delimit cr
 display in smcl as text "`sql_statement'"
 odbc load, exec("`sql_statement';") dsn("Depep")
-save "\\sbcdf060\depep01$\Bernardus\Cunha_Santos_Doornik\Dta_files\RAIS_firm_01.dta", replace
+save "\\sbcdf060\depep02$\Bernardus\Cunha_Santos_Doornik\Dta_files\RAIS_firm_01.dta", replace
 
 
 
@@ -187,7 +187,7 @@ GROUP BY [RADIC CNPJ]
 #delimit cr
 display in smcl as text "`sql_statement'"
 odbc load, exec("`sql_statement';") dsn("Depep")
-save "\\sbcdf060\depep01$\Bernardus\Cunha_Santos_Doornik\Dta_files\RAIS_firm_02.dta", replace
+save "\\sbcdf060\depep02$\Bernardus\Cunha_Santos_Doornik\Dta_files\RAIS_firm_02.dta", replace
 
 
 
@@ -207,7 +207,7 @@ GROUP BY [RADIC CNPJ]
 #delimit cr
 display in smcl as text "`sql_statement'"
 odbc load, exec("`sql_statement';") dsn("Depep")
-save "\\sbcdf060\depep01$\Bernardus\Cunha_Santos_Doornik\Dta_files\RAIS_firm_03.dta", replace
+save "\\sbcdf060\depep02$\Bernardus\Cunha_Santos_Doornik\Dta_files\RAIS_firm_03.dta", replace
 
 
 
@@ -228,7 +228,7 @@ GROUP BY [RADIC CNPJ]
 #delimit cr
 display in smcl as text "`sql_statement'"
 odbc load, exec("`sql_statement';") dsn("Depep")
-save "\\sbcdf060\depep01$\Bernardus\Cunha_Santos_Doornik\Dta_files\RAIS_firm_04.dta", replace
+save "\\sbcdf060\depep02$\Bernardus\Cunha_Santos_Doornik\Dta_files\RAIS_firm_04.dta", replace
 
 
 
@@ -249,7 +249,7 @@ GROUP BY [RADIC CNPJ]
 #delimit cr
 display in smcl as text "`sql_statement'"
 odbc load, exec("`sql_statement';") dsn("Depep")
-save "\\sbcdf060\depep01$\Bernardus\Cunha_Santos_Doornik\Dta_files\RAIS_firm_05.dta", replace
+save "\\sbcdf060\depep02$\Bernardus\Cunha_Santos_Doornik\Dta_files\RAIS_firm_05.dta", replace
 
 
 
@@ -269,7 +269,7 @@ GROUP BY [RADIC CNPJ]
 #delimit cr
 display in smcl as text "`sql_statement'"
 odbc load, exec("`sql_statement';") dsn("Depep")
-save "\\sbcdf060\depep01$\Bernardus\Cunha_Santos_Doornik\Dta_files\RAIS_firm_06.dta", replace
+save "\\sbcdf060\depep02$\Bernardus\Cunha_Santos_Doornik\Dta_files\RAIS_firm_06.dta", replace
 
 
 
@@ -290,7 +290,7 @@ GROUP BY [RADIC CNPJ]
 #delimit cr
 display in smcl as text "`sql_statement'"
 odbc load, exec("`sql_statement';") dsn("Depep")
-save "\\sbcdf060\depep01$\Bernardus\Cunha_Santos_Doornik\Dta_files\RAIS_firm_07.dta", replace
+save "\\sbcdf060\depep02$\Bernardus\Cunha_Santos_Doornik\Dta_files\RAIS_firm_07.dta", replace
 
 
 
@@ -312,7 +312,7 @@ GROUP BY [RADIC CNPJ]
 #delimit cr
 display in smcl as text "`sql_statement'"
 odbc load, exec("`sql_statement';") dsn("Depep")
-save "\\sbcdf060\depep01$\Bernardus\Cunha_Santos_Doornik\Dta_files\RAIS_firm_08.dta", replace
+save "\\sbcdf060\depep02$\Bernardus\Cunha_Santos_Doornik\Dta_files\RAIS_firm_08.dta", replace
 
 
 
@@ -333,7 +333,7 @@ GROUP BY [RADIC CNPJ]
 #delimit cr
 display in smcl as text "`sql_statement'"
 odbc load, exec("`sql_statement';") dsn("Depep")
-save "\\sbcdf060\depep01$\Bernardus\Cunha_Santos_Doornik\Dta_files\RAIS_firm_09.dta", replace
+save "\\sbcdf060\depep02$\Bernardus\Cunha_Santos_Doornik\Dta_files\RAIS_firm_09.dta", replace
 
 
 
@@ -353,7 +353,7 @@ GROUP BY [RADIC CNPJ]
 #delimit cr
 display in smcl as text "`sql_statement'"
 odbc load, exec("`sql_statement';") dsn("Depep")
-save "\\sbcdf060\depep01$\Bernardus\Cunha_Santos_Doornik\Dta_files\RAIS_firm_10.dta", replace
+save "\\sbcdf060\depep02$\Bernardus\Cunha_Santos_Doornik\Dta_files\RAIS_firm_10.dta", replace
 
 
 
@@ -374,7 +374,7 @@ GROUP BY [CNPJ Raiz]
 #delimit cr
 display in smcl as text "`sql_statement'"
 odbc load, exec("`sql_statement';") dsn("Depep")
-save "\\sbcdf060\depep01$\Bernardus\Cunha_Santos_Doornik\Dta_files\RAIS_firm_11.dta", replace
+save "\\sbcdf060\depep02$\Bernardus\Cunha_Santos_Doornik\Dta_files\RAIS_firm_11.dta", replace
 
 
 
@@ -394,7 +394,7 @@ GROUP BY [CNPJ Raiz]
 #delimit cr
 display in smcl as text "`sql_statement'"
 odbc load, exec("`sql_statement';") dsn("Depep")
-save "\\sbcdf060\depep01$\Bernardus\Cunha_Santos_Doornik\Dta_files\RAIS_firm_12.dta", replace
+save "\\sbcdf060\depep02$\Bernardus\Cunha_Santos_Doornik\Dta_files\RAIS_firm_12.dta", replace
 
 
 
@@ -414,7 +414,7 @@ GROUP BY [CNPJ Raiz]
 #delimit cr
 display in smcl as text "`sql_statement'"
 odbc load, exec("`sql_statement';") dsn("Depep")
-save "\\sbcdf060\depep01$\Bernardus\Cunha_Santos_Doornik\Dta_files\RAIS_firm_13.dta", replace
+save "\\sbcdf060\depep02$\Bernardus\Cunha_Santos_Doornik\Dta_files\RAIS_firm_13.dta", replace
 
 
 
@@ -434,7 +434,7 @@ GROUP BY [CNPJ Raiz]
 #delimit cr
 display in smcl as text "`sql_statement'"
 odbc load, exec("`sql_statement';") dsn("Depep")
-save "\\sbcdf060\depep01$\Bernardus\Cunha_Santos_Doornik\Dta_files\RAIS_firm_14.dta", replace
+save "\\sbcdf060\depep02$\Bernardus\Cunha_Santos_Doornik\Dta_files\RAIS_firm_14.dta", replace
 
 
 
@@ -454,7 +454,7 @@ GROUP BY [CNPJ Raiz]
 #delimit cr
 display in smcl as text "`sql_statement'"
 odbc load, exec("`sql_statement';") dsn("Depep")
-save "\\sbcdf060\depep01$\Bernardus\Cunha_Santos_Doornik\Dta_files\RAIS_firm_15.dta", replace
+save "\\sbcdf060\depep02$\Bernardus\Cunha_Santos_Doornik\Dta_files\RAIS_firm_15.dta", replace
 
 
 
@@ -474,7 +474,7 @@ GROUP BY [cnpjraiz]
 #delimit cr
 display in smcl as text "`sql_statement'"
 odbc load, exec("`sql_statement';") dsn("Depep")
-save "\\sbcdf060\depep01$\Bernardus\Cunha_Santos_Doornik\Dta_files\RAIS_firm_16.dta", replace
+save "\\sbcdf060\depep02$\Bernardus\Cunha_Santos_Doornik\Dta_files\RAIS_firm_16.dta", replace
 
 
 
@@ -494,7 +494,7 @@ GROUP BY [cnpjraiz]
 #delimit cr
 display in smcl as text "`sql_statement'"
 odbc load, exec("`sql_statement';") dsn("Depep")
-save "\\sbcdf060\depep01$\Bernardus\Cunha_Santos_Doornik\Dta_files\RAIS_firm_17.dta", replace
+save "\\sbcdf060\depep02$\Bernardus\Cunha_Santos_Doornik\Dta_files\RAIS_firm_17.dta", replace
 
 
 
@@ -514,7 +514,7 @@ GROUP BY [cnpjraiz]
 #delimit cr
 display in smcl as text "`sql_statement'"
 odbc load, exec("`sql_statement';") dsn("Depep")
-save "\\sbcdf060\depep01$\Bernardus\Cunha_Santos_Doornik\Dta_files\RAIS_firm_18.dta", replace
+save "\\sbcdf060\depep02$\Bernardus\Cunha_Santos_Doornik\Dta_files\RAIS_firm_18.dta", replace
 
 
 
@@ -534,7 +534,7 @@ GROUP BY [cnpjraiz]
 #delimit cr
 display in smcl as text "`sql_statement'"
 odbc load, exec("`sql_statement';") dsn("Depep")
-save "\\sbcdf060\depep01$\Bernardus\Cunha_Santos_Doornik\Dta_files\RAIS_firm_19.dta", replace
+save "\\sbcdf060\depep02$\Bernardus\Cunha_Santos_Doornik\Dta_files\RAIS_firm_19.dta", replace
 
 
 
@@ -554,7 +554,7 @@ GROUP BY [cnpjraiz]
 #delimit cr
 display in smcl as text "`sql_statement'"
 odbc load, exec("`sql_statement';") dsn("Depep")
-save "\\sbcdf060\depep01$\Bernardus\Cunha_Santos_Doornik\Dta_files\RAIS_firm_20.dta", replace
+save "\\sbcdf060\depep02$\Bernardus\Cunha_Santos_Doornik\Dta_files\RAIS_firm_20.dta", replace
 
 
 
@@ -574,4 +574,4 @@ GROUP BY [cnpjraiz]
 #delimit cr
 display in smcl as text "`sql_statement'"
 odbc load, exec("`sql_statement';") dsn("Depep")
-save "\\sbcdf060\depep01$\Bernardus\Cunha_Santos_Doornik\Dta_files\RAIS_firm_21.dta", replace
+save "\\sbcdf060\depep02$\Bernardus\Cunha_Santos_Doornik\Dta_files\RAIS_firm_21.dta", replace

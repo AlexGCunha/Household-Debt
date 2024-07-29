@@ -337,6 +337,15 @@ for( y in initial_year:final_year){
     )) %>% 
     ungroup()
   
+  #Some individuals were working but appear with 0 wage. Drop these individuals
+  df = df %>% 
+    mutate(error = ifelse(!is.na(cnpj_t) & real_wage_t == 0, 1, 0)) %>% 
+    group_by(pis) %>% 
+    mutate(error_any_year = max(error)) %>% 
+    ungroup() %>% 
+    filter(error_any_year == 0) %>% 
+    select(!c(error, error_any_year))
+  
   ######################################
   #First Match
   ######################################
@@ -362,7 +371,7 @@ for( y in initial_year:final_year){
   #Filter individuals with full information on debt level and cnae
   #(for exact matching)
   df_match = df_match %>% 
-    filter(!is.na(cnae1_t) & !is.na(debt_level_t))
+    filter(!is.na(cnae1_t) & !is.na(debt_ratio_t))
   
   #Filter individuals who either lost job in a mass layoff or did not lose job
   df_match = df_match %>% 
@@ -372,7 +381,7 @@ for( y in initial_year:final_year){
                  real_wage_tm1 + real_wage_tm2 + factor(skill) +
                  emp_time_t + age_t,
                data = df_match,
-               exact = c('debt_level_b', 'cnae1_t'),
+               exact = c('decile_debt_b', 'cnae1_t'),
                method = 'nearest',
                distance = 'glm')
   
@@ -578,7 +587,7 @@ rais_agg = rais_agg %>%
   mutate(recession_t = ifelse(baseline %in% recession_years, 1, 0),
          recession_b1 = ifelse((baseline + 1) %in% recession_years, 1, 0))
 
-#some information on the baseline year
+#Information on the baseline year
 rais_agg = rais_agg %>% 
   group_by(pis) %>% 
   mutate(munic_b = munic_t[ano == baseline],
@@ -586,6 +595,16 @@ rais_agg = rais_agg %>%
          dist_min = dist_min[ano == baseline]) %>% 
   ungroup() %>% 
   select(!c(munic_t))
+
+#Some individuals were working but appear with 0 wage. Drop these 
+rais_agg = rais_agg %>% 
+  mutate(error = ifelse(!is.na(cnpj_t) & real_wage_t == 0, 1, 0)) %>% 
+  group_by(pis) %>% 
+  mutate(error_any_year == max(error)) %>% 
+  ungroup() %>% 
+  filter(error_any_year == 0) %>% 
+  select(!c(error, error_any_year))
+  
 
 
 #Save

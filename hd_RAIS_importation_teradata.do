@@ -5,7 +5,7 @@
 00_SCR_importation_teradata_yyyymmdd
 
  
-This Do file will download  RAIS data from TERADATA from 1992 to 2018, SELECT top 10ing just a subsection of columns
+This Do file will download  RAIS data  from 1992 to 2018, 
  
 
 */
@@ -40,7 +40,7 @@ CAST([Vínculo Ativo 31 12] AS int) = 1
 #delimit cr
 display in smcl as text "`sql_statement'"
 odbc load, exec("`sql_statement';") dsn("Depep")
-save "\\sbcdf060\depep01$\Bernardus\Cunha_Santos_Doornik\Dta_files\RAIS_hd_92.dta", replace
+save "\\sbcdf060\depep02$\Bernardus\Cunha_Santos_Doornik\Dta_files\RAIS_hd_92.dta", replace
 
 
 *****1993
@@ -70,7 +70,7 @@ CAST([Vínculo Ativo 31 12] AS int) = 1
 #delimit cr
 display in smcl as text "`sql_statement'"
 odbc load, exec("`sql_statement';") dsn("Depep")
-save "\\sbcdf060\depep01$\Bernardus\Cunha_Santos_Doornik\Dta_files\RAIS_hd_93.dta", replace
+save "\\sbcdf060\depep02$\Bernardus\Cunha_Santos_Doornik\Dta_files\RAIS_hd_93.dta", replace
 
 */
 *****1994
@@ -103,7 +103,7 @@ CAST([Vínculo Ativo 31 12] AS int) = 1
 #delimit cr
 display in smcl as text "`sql_statement'"
 odbc load, exec("`sql_statement';") dsn("Depep")
-save "\\sbcdf060\depep01$\Bernardus\Cunha_Santos_Doornik\Dta_files\RAIS_hd_94.dta", replace
+save "\\sbcdf060\depep02$\Bernardus\Cunha_Santos_Doornik\Dta_files\RAIS_hd_94.dta", replace
 
 
 
@@ -137,7 +137,7 @@ CAST([Vínculo Ativo 31 12] AS int) = 1
 #delimit cr
 display in smcl as text "`sql_statement'"
 odbc load, exec("`sql_statement';") dsn("Depep")
-save "\\sbcdf060\depep01$\Bernardus\Cunha_Santos_Doornik\Dta_files\RAIS_hd_95.dta", replace
+save "\\sbcdf060\depep02$\Bernardus\Cunha_Santos_Doornik\Dta_files\RAIS_hd_95.dta", replace
 
 
 
@@ -171,7 +171,7 @@ CAST([Vínculo Ativo 31 12] AS int) = 1
 #delimit cr
 display in smcl as text "`sql_statement'"
 odbc load, exec("`sql_statement';") dsn("Depep")
-save "\\sbcdf060\depep01$\Bernardus\Cunha_Santos_Doornik\Dta_files\RAIS_hd_96.dta", replace
+save "\\sbcdf060\depep02$\Bernardus\Cunha_Santos_Doornik\Dta_files\RAIS_hd_96.dta", replace
 
 
 
@@ -205,7 +205,7 @@ CAST([Vínculo Ativo 31 12] AS int) = 1
 #delimit cr
 display in smcl as text "`sql_statement'"
 odbc load, exec("`sql_statement';") dsn("Depep")
-save "\\sbcdf060\depep01$\Bernardus\Cunha_Santos_Doornik\Dta_files\RAIS_hd_97.dta", replace
+save "\\sbcdf060\depep02$\Bernardus\Cunha_Santos_Doornik\Dta_files\RAIS_hd_97.dta", replace
 
 
 
@@ -239,7 +239,7 @@ CAST([Vínculo Ativo 31 12] AS int) = 1
 #delimit cr
 display in smcl as text "`sql_statement'"
 odbc load, exec("`sql_statement';") dsn("Depep")
-save "\\sbcdf060\depep01$\Bernardus\Cunha_Santos_Doornik\Dta_files\RAIS_hd_98.dta", replace
+save "\\sbcdf060\depep02$\Bernardus\Cunha_Santos_Doornik\Dta_files\RAIS_hd_98.dta", replace
 
 
 
@@ -274,7 +274,7 @@ CAST([Vínculo Ativo 31 12] AS int) = 1
 #delimit cr
 display in smcl as text "`sql_statement'"
 odbc load, exec("`sql_statement';") dsn("Depep")
-save "\\sbcdf060\depep01$\Bernardus\Cunha_Santos_Doornik\Dta_files\RAIS_hd_99.dta", replace
+save "\\sbcdf060\depep02$\Bernardus\Cunha_Santos_Doornik\Dta_files\RAIS_hd_99.dta", replace
 
 
 
@@ -309,7 +309,7 @@ CAST([Vínculo Ativo 31 12] AS int) = 1
 #delimit cr
 display in smcl as text "`sql_statement'"
 odbc load, exec("`sql_statement';") dsn("Depep")
-save "\\sbcdf060\depep01$\Bernardus\Cunha_Santos_Doornik\Dta_files\RAIS_hd_00.dta", replace
+save "\\sbcdf060\depep02$\Bernardus\Cunha_Santos_Doornik\Dta_files\RAIS_hd_00.dta", replace
 
 
 
@@ -344,7 +344,7 @@ CAST([Vínculo Ativo 31 12] AS int) = 1
 #delimit cr
 display in smcl as text "`sql_statement'"
 odbc load, exec("`sql_statement';") dsn("Depep")
-save "\\sbcdf060\depep01$\Bernardus\Cunha_Santos_Doornik\Dta_files\RAIS_hd_01.dta", replace
+save "\\sbcdf060\depep02$\Bernardus\Cunha_Santos_Doornik\Dta_files\RAIS_hd_01.dta", replace
 
 
 
@@ -373,14 +373,13 @@ SELECT [MUNICIPIO] as munic
 ,[HORAS CONTR] as wk_hours
 ,[CPF] as cpf
 FROM [Depep].[dbo].[RAIS2002]
-WHERE [TP VINCL] IN ('CLT R/PJ IND', 'CLT R/PF IND', 'CLT U/PJ IND', 'CLT U/PF IND', 'APREND CONTR', 'DIRETOR', 'AVULSO') AND
-CAST([EMP EM 31 12] AS int) = 1
+WHERE [TP VINCL] IN ('CLT R/PJ IND', 'CLT R/PF IND', 'CLT U/PJ IND', 'CLT U/PF IND', 'APREND CONTR', 'DIRETOR', 'AVULSO') 
 
 ;
 #delimit cr
 display in smcl as text "`sql_statement'"
 odbc load, exec("`sql_statement';") dsn("Depep")
-save "\\sbcdf060\depep01$\Bernardus\Cunha_Santos_Doornik\Dta_files\RAIS_hd_02.dta", replace
+save "\\sbcdf060\depep02$\Bernardus\Cunha_Santos_Doornik\Dta_files\RAIS_hd_02.dta", replace
 
 
 *****2003
@@ -410,15 +409,13 @@ SELECT [MUNICIPIO] as munic
 ,[CPF] as cpf
 ,[OCUP 2002] as cbo_02
 FROM [Depep].[dbo].[RAIS2003]
-WHERE [TP VINCULO] IN ('10', '15', '20', '25', '40', '55', '80') AND
-CAST([EMP EM 31 12] AS int) = 1
+WHERE [TP VINCULO] IN ('10', '15', '20', '25', '40', '55', '80') 
 
 ;
 #delimit cr
 display in smcl as text "`sql_statement'"
 odbc load, exec("`sql_statement';") dsn("Depep")
-save "\\sbcdf060\depep01$\Bernardus\Cunha_Santos_Doornik\Dta_files\RAIS_hd_03.dta", replace
-
+save "\\sbcdf060\depep02$\Bernardus\Cunha_Santos_Doornik\Dta_files\RAIS_hd_03.dta", replace
 
 
 *****2004
@@ -456,7 +453,7 @@ CAST([EMP EM 31 12] AS int) = 1
 #delimit cr
 display in smcl as text "`sql_statement'"
 odbc load, exec("`sql_statement';") dsn("Depep")
-save "\\sbcdf060\depep01$\Bernardus\Cunha_Santos_Doornik\Dta_files\RAIS_hd_04.dta", replace
+save "\\sbcdf060\depep02$\Bernardus\Cunha_Santos_Doornik\Dta_files\RAIS_hd_04.dta", replace
 
 
 
@@ -495,7 +492,7 @@ CAST([EMP EM 31 12] AS int) = 1
 #delimit cr
 display in smcl as text "`sql_statement'"
 odbc load, exec("`sql_statement';") dsn("Depep")
-save "\\sbcdf060\depep01$\Bernardus\Cunha_Santos_Doornik\Dta_files\RAIS_hd_05.dta", replace
+save "\\sbcdf060\depep02$\Bernardus\Cunha_Santos_Doornik\Dta_files\RAIS_hd_05.dta", replace
 
 
 
@@ -534,7 +531,7 @@ CAST([EMP EM 31 12] AS int) = 1
 #delimit cr
 display in smcl as text "`sql_statement'"
 odbc load, exec("`sql_statement';") dsn("Depep")
-save "\\sbcdf060\depep01$\Bernardus\Cunha_Santos_Doornik\Dta_files\RAIS_hd_06.dta", replace
+save "\\sbcdf060\depep02$\Bernardus\Cunha_Santos_Doornik\Dta_files\RAIS_hd_06.dta", replace
 
 
 
@@ -573,7 +570,7 @@ CAST([EMP EM 31 12] AS int) = 1
 #delimit cr
 display in smcl as text "`sql_statement'"
 odbc load, exec("`sql_statement';") dsn("Depep")
-save "\\sbcdf060\depep01$\Bernardus\Cunha_Santos_Doornik\Dta_files\RAIS_hd_07.dta", replace
+save "\\sbcdf060\depep02$\Bernardus\Cunha_Santos_Doornik\Dta_files\RAIS_hd_07.dta", replace
 
 
 
@@ -612,7 +609,7 @@ CAST([EMP EM 31 12] AS int) = 1
 #delimit cr
 display in smcl as text "`sql_statement'"
 odbc load, exec("`sql_statement';") dsn("Depep")
-save "\\sbcdf060\depep01$\Bernardus\Cunha_Santos_Doornik\Dta_files\RAIS_hd_08.dta", replace
+save "\\sbcdf060\depep02$\Bernardus\Cunha_Santos_Doornik\Dta_files\RAIS_hd_08.dta", replace
 
 
 
@@ -651,7 +648,7 @@ CAST([EMP EM 31 12] AS int) = 1
 #delimit cr
 display in smcl as text "`sql_statement'"
 odbc load, exec("`sql_statement';") dsn("Depep")
-save "\\sbcdf060\depep01$\Bernardus\Cunha_Santos_Doornik\Dta_files\RAIS_hd_09.dta", replace
+save "\\sbcdf060\depep02$\Bernardus\Cunha_Santos_Doornik\Dta_files\RAIS_hd_09.dta", replace
 
 
 
@@ -689,7 +686,7 @@ CAST([EMP EM 31 12] AS int) = 1
 #delimit cr
 display in smcl as text "`sql_statement'"
 odbc load, exec("`sql_statement';") dsn("Depep")
-save "\\sbcdf060\depep01$\Bernardus\Cunha_Santos_Doornik\Dta_files\RAIS_hd_10.dta", replace
+save "\\sbcdf060\depep02$\Bernardus\Cunha_Santos_Doornik\Dta_files\RAIS_hd_10.dta", replace
 
 
 
@@ -727,7 +724,7 @@ CAST([Vínculo Ativo 31 12] AS int) = 1
 #delimit cr
 display in smcl as text "`sql_statement'"
 odbc load, exec("`sql_statement';") dsn("Depep")
-save "\\sbcdf060\depep01$\Bernardus\Cunha_Santos_Doornik\Dta_files\RAIS_hd_11.dta", replace
+save "\\sbcdf060\depep02$\Bernardus\Cunha_Santos_Doornik\Dta_files\RAIS_hd_11.dta", replace
 
 
 
@@ -764,7 +761,7 @@ CAST([Vínculo Ativo 31 12] AS int) = 1
 #delimit cr
 display in smcl as text "`sql_statement'"
 odbc load, exec("`sql_statement';") dsn("Depep")
-save "\\sbcdf060\depep01$\Bernardus\Cunha_Santos_Doornik\Dta_files\RAIS_hd_12.dta", replace
+save "\\sbcdf060\depep02$\Bernardus\Cunha_Santos_Doornik\Dta_files\RAIS_hd_12.dta", replace
 
 
 
@@ -802,7 +799,7 @@ CAST([Vínculo Ativo 31 12] AS int) = 1
 #delimit cr
 display in smcl as text "`sql_statement'"
 odbc load, exec("`sql_statement';") dsn("Depep")
-save "\\sbcdf060\depep01$\Bernardus\Cunha_Santos_Doornik\Dta_files\RAIS_hd_13.dta", replace
+save "\\sbcdf060\depep02$\Bernardus\Cunha_Santos_Doornik\Dta_files\RAIS_hd_13.dta", replace
 
 
 
@@ -841,7 +838,7 @@ CAST([Vínculo Ativo 31 12] AS int) = 1
 #delimit cr
 display in smcl as text "`sql_statement'"
 odbc load, exec("`sql_statement';") dsn("Depep")
-save "\\sbcdf060\depep01$\Bernardus\Cunha_Santos_Doornik\Dta_files\RAIS_hd_14.dta", replace
+save "\\sbcdf060\depep02$\Bernardus\Cunha_Santos_Doornik\Dta_files\RAIS_hd_14.dta", replace
 
 
 
@@ -880,7 +877,7 @@ CAST([Vínculo Ativo 31 12] AS int) = 1
 #delimit cr
 display in smcl as text "`sql_statement'"
 odbc load, exec("`sql_statement';") dsn("Depep")
-save "\\sbcdf060\depep01$\Bernardus\Cunha_Santos_Doornik\Dta_files\RAIS_hd_15.dta", replace
+save "\\sbcdf060\depep02$\Bernardus\Cunha_Santos_Doornik\Dta_files\RAIS_hd_15.dta", replace
 
 
 
@@ -919,7 +916,7 @@ CAST([vinculoativo3112] AS int) = 1
 #delimit cr
 display in smcl as text "`sql_statement'"
 odbc load, exec("`sql_statement';") dsn("Depep")
-save "\\sbcdf060\depep01$\Bernardus\Cunha_Santos_Doornik\Dta_files\RAIS_hd_16.dta", replace
+save "\\sbcdf060\depep02$\Bernardus\Cunha_Santos_Doornik\Dta_files\RAIS_hd_16.dta", replace
 
 
 
@@ -958,7 +955,7 @@ CAST([vinculoativo3112] AS int) = 1
 #delimit cr
 display in smcl as text "`sql_statement'"
 odbc load, exec("`sql_statement';") dsn("Depep")
-save "\\sbcdf060\depep01$\Bernardus\Cunha_Santos_Doornik\Dta_files\RAIS_hd_17.dta", replace
+save "\\sbcdf060\depep02$\Bernardus\Cunha_Santos_Doornik\Dta_files\RAIS_hd_17.dta", replace
 
 
 
@@ -997,7 +994,7 @@ CAST([vinculoativo3112] AS int) = 1
 #delimit cr
 display in smcl as text "`sql_statement'"
 odbc load, exec("`sql_statement';") dsn("Depep")
-save "\\sbcdf060\depep01$\Bernardus\Cunha_Santos_Doornik\Dta_files\RAIS_hd_18.dta", replace
+save "\\sbcdf060\depep02$\Bernardus\Cunha_Santos_Doornik\Dta_files\RAIS_hd_18.dta", replace
 
 
 
@@ -1036,7 +1033,7 @@ CAST([vinculoativo3112] AS int) = 1
 #delimit cr
 display in smcl as text "`sql_statement'"
 odbc load, exec("`sql_statement';") dsn("Depep")
-save "\\sbcdf060\depep01$\Bernardus\Cunha_Santos_Doornik\Dta_files\RAIS_hd_19.dta", replace
+save "\\sbcdf060\depep02$\Bernardus\Cunha_Santos_Doornik\Dta_files\RAIS_hd_19.dta", replace
 
 
 
@@ -1076,7 +1073,7 @@ CAST([vinculoativo3112] AS int) = 1
 #delimit cr
 display in smcl as text "`sql_statement'"
 odbc load, exec("`sql_statement';") dsn("Depep")
-save "\\sbcdf060\depep01$\Bernardus\Cunha_Santos_Doornik\Dta_files\RAIS_hd_20.dta", replace
+save "\\sbcdf060\depep02$\Bernardus\Cunha_Santos_Doornik\Dta_files\RAIS_hd_20.dta", replace
 
 
 
@@ -1115,4 +1112,4 @@ CAST([vinculoativo3112] AS int) = 1
 #delimit cr
 display in smcl as text "`sql_statement'"
 odbc load, exec("`sql_statement';") dsn("Depep")
-save "\\sbcdf060\depep01$\Bernardus\Cunha_Santos_Doornik\Dta_files\RAIS_hd_21.dta", replace
+save "\\sbcdf060\depep02$\Bernardus\Cunha_Santos_Doornik\Dta_files\RAIS_hd_21.dta", replace
