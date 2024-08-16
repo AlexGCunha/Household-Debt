@@ -114,12 +114,15 @@ scr_all = scr_all %>%
 scr_loans = read_stata("Dta_files/hd_SCR_indivudal_loans.dta")
 scr_loans = clean_scr(scr_loans)
 
+print(summary(scr_all))
+print(summary(scr_loans))
+
 ######################################
 #Loop to create a base for each year
 ######################################
 for( y in initial_year:final_year){
   b = Sys.time()
-  filename = paste0('Dta_files/RAIS_comp_', y, '.parquet')
+  filename = paste0('Dta_files/RAIS_comp_filt_', y, '.parquet')
   rais = read_parquet(filename)
   
   #Get pis information for 2010:
@@ -188,7 +191,7 @@ for( y in initial_year:final_year){
   
   sub_rais = tibble()
   for (sub_y in max((y - years_prior), 1995):min((y+years_advance), 2017)){
-    filename = paste0('Dta_files/RAIS_comp_', sub_y, '.parquet')
+    filename = paste0('Dta_files/RAIS_comp_filt_', sub_y, '.parquet')
     aux = read_parquet(filename) %>% 
       filter(pis %in% pis_keep)
     sub_rais = rbind(sub_rais, aux)
