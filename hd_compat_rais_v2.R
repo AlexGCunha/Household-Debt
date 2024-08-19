@@ -32,7 +32,6 @@ sex_use = c(1)
 min_age = 24
 max_age = 50
 
-sink("../Output_check/log_hd_compat_rais.txt")
 ###################################
 #Print structure of each downloaded database
 ###################################
@@ -693,7 +692,6 @@ b = Sys.time()
 message = paste0('Time to clean yearly datasets: ', 
                  round(difftime(b, a, units = 'hours'),1), ' hours')
 print(message)
-sink()
 
 rm(list = ls())
 gc()

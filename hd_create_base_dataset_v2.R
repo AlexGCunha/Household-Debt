@@ -515,7 +515,9 @@ print(summary(rais_agg))
 # who was fired and had a low debt ratio
 ######################################
 df_match = rais_agg %>% 
-  filter(ano == baseline)
+  filter(ano == baseline, 
+         perdeu_emprego_demissao_massa_b1 == 1) %>% 
+  rownames_to_column()
 
 m2 = matchit(high_debt_b ~ n_employees_t + real_wage_tm1 +
                real_wage_tm2 + factor(skill)+ emp_time_t+ age_t,
@@ -524,10 +526,6 @@ m2 = matchit(high_debt_b ~ n_employees_t + real_wage_tm1 +
              distance = 'glm')
 
 print(summary(m2))
-
-#Indices for the match are given by rownumber, so lets add that 
-df_match = df_match %>% 
-  rownames_to_column()
 
 #Work on match information to puth back in the dataset
 match_matrix = as.tibble(m2$match_matrix)
