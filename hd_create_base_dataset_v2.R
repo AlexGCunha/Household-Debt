@@ -509,6 +509,9 @@ rais_agg = rais_agg %>%
 
 print(summary(rais_agg))
 
+#Save dataset until here as a checkpoint
+write_parquet(rais_agg, "Dta_files/after_first_match_v2.parquet")
+
 ######################################
 #Second Match
 #- Match individuals who were fired and were with high debt ratio to another

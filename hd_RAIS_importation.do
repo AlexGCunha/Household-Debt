@@ -2,384 +2,19 @@
 
  
 
-00_SCR_importation_teradata_yyyymmdd
+hd_RAIS_importation_yyyymmdd
 
  
-This Do file will download  RAIS data  from 1992 to 2018, 
+This Do file will download  RAIS data  from 2003 to 2021 
  
 
 */
 
 
 set more off, perm
-/*
-*****1992
-
-clear
-#delimit ;
-
-local sql_statement
-SELECT [Município] as munic
-,[Vínculo Ativo 31 12] as active
-,[Tipo Vínculo] as emp_type
-,[Motivo Desligamento] as quit_reason
-,[Mês Desligamento] as quit_month
-,[CBO Ocupação] as cbo
-,[Grau Instrução 2005-1985] as educ_85
-,[Sexo Trabalhador] as sex
-,[Mês Admissão] as hire_month
-,[Tempo Emprego] as emp_time
-,[PIS] as pis
-,[CNPJ Raiz] as cnpj
-,[Vl Remun Dezembro (SM)] as wage_dec_sm
-FROM [Depep].[dbo].[RAIS1992]
-WHERE [Tipo Vínculo] IN ('10', '15', '20', '25', '40', '55', '80') AND
-CAST([Vínculo Ativo 31 12] AS int) = 1
-
-;
-#delimit cr
-display in smcl as text "`sql_statement'"
-odbc load, exec("`sql_statement';") dsn("Depep")
-save "\\sbcdf060\depep02$\Bernardus\Cunha_Santos_Doornik\Dta_files\RAIS_hd_92.dta", replace
-
-
-*****1993
-
-clear
-#delimit ;
-
-local sql_statement
-SELECT [Município] as munic
-,[Vínculo Ativo 31 12] as active
-,[Tipo Vínculo] as emp_type
-,[Motivo Desligamento] as quit_reason
-,[Mês Desligamento] as quit_month
-,[CBO Ocupação] as cbo
-,[Grau Instrução 2005-1985] as educ_85
-,[Sexo Trabalhador] as sex
-,[Mês Admissão] as hire_month
-,[Tempo Emprego] as emp_time
-,[PIS] as pis
-,[CNPJ Raiz] as cnpj
-,[Vl Remun Dezembro (SM)] as wage_dec_sm
-FROM [Depep].[dbo].[RAIS1993]
-WHERE [Tipo Vínculo] IN ('10', '15', '20', '25', '40', '55', '80') AND
-CAST([Vínculo Ativo 31 12] AS int) = 1
-
-;
-#delimit cr
-display in smcl as text "`sql_statement'"
-odbc load, exec("`sql_statement';") dsn("Depep")
-save "\\sbcdf060\depep02$\Bernardus\Cunha_Santos_Doornik\Dta_files\RAIS_hd_93.dta", replace
-
-*/
-*****1994
-
-clear
-#delimit ;
-
-local sql_statement
-SELECT [Município] as munic
-,[Vínculo Ativo 31 12] as active
-,[Tipo Vínculo] as emp_type
-,[Motivo Desligamento] as quit_reason
-,[Mês Desligamento] as quit_month
-,[CBO 94 Ocupação] as cbo_94
-,[Grau Instrução 2005-1985] as educ_85
-,[Sexo Trabalhador] as sex
-,[Mês Admissão] as hire_month
-,[Tempo Emprego] as emp_time
-,[PIS] as pis
-,[CNPJ Raiz] as cnpj
-,[Idade] as age
-,[CNAE 95 Classe] as cnae_95
-,[Vl Remun Dezembro (SM)] as wage_dec_sm
-,[Qtd Hora Contr] as wk_hours
-FROM [Depep].[dbo].[RAIS1994]
-WHERE [Tipo Vínculo] IN ('10', '15', '20', '25', '40', '55', '80') AND
-CAST([Vínculo Ativo 31 12] AS int) = 1
-
-;
-#delimit cr
-display in smcl as text "`sql_statement'"
-odbc load, exec("`sql_statement';") dsn("Depep")
-save "\\sbcdf060\depep02$\Bernardus\Cunha_Santos_Doornik\Dta_files\RAIS_hd_94.dta", replace
 
 
 
-*****1995
-
-clear
-#delimit ;
-
-local sql_statement
-SELECT [Município] as munic
-,[Vínculo Ativo 31 12] as active
-,[Tipo Vínculo] as emp_type
-,[Motivo Desligamento] as quit_reason
-,[Mês Desligamento] as quit_month
-,[CBO 94 Ocupação] as cbo_94
-,[Grau Instrução 2005-1985] as educ_85
-,[Sexo Trabalhador] as sex
-,[Mês Admissão] as hire_month
-,[Tempo Emprego] as emp_time
-,[PIS] as pis
-,[CNPJ Raiz] as cnpj
-,[Idade] as age
-,[CNAE 95 Classe] as cnae_95
-,[Vl Remun Dezembro (SM)] as wage_dec_sm
-,[Qtd Hora Contr] as wk_hours
-FROM [Depep].[dbo].[RAIS1995]
-WHERE [Tipo Vínculo] IN ('10', '15', '20', '25', '40', '55', '80') AND
-CAST([Vínculo Ativo 31 12] AS int) = 1
-
-;
-#delimit cr
-display in smcl as text "`sql_statement'"
-odbc load, exec("`sql_statement';") dsn("Depep")
-save "\\sbcdf060\depep02$\Bernardus\Cunha_Santos_Doornik\Dta_files\RAIS_hd_95.dta", replace
-
-
-
-*****1996
-
-clear
-#delimit ;
-
-local sql_statement
-SELECT [Município] as munic
-,[Vínculo Ativo 31 12] as active
-,[Tipo Vínculo] as emp_type
-,[Motivo Desligamento] as quit_reason
-,[Mês Desligamento] as quit_month
-,[CBO 94 Ocupação] as cbo_94
-,[Grau Instrução 2005-1985] as educ_85
-,[Sexo Trabalhador] as sex
-,[Mês Admissão] as hire_month
-,[Tempo Emprego] as emp_time
-,[PIS] as pis
-,[CNPJ Raiz] as cnpj
-,[Idade] as age
-,[CNAE 95 Classe] as cnae_95
-,[Vl Remun Dezembro (SM)] as wage_dec_sm
-,[Qtd Hora Contr] as wk_hours
-FROM [Depep].[dbo].[RAIS1996]
-WHERE [Tipo Vínculo] IN ('10', '15', '20', '25', '40', '55', '80') AND
-CAST([Vínculo Ativo 31 12] AS int) = 1
-
-;
-#delimit cr
-display in smcl as text "`sql_statement'"
-odbc load, exec("`sql_statement';") dsn("Depep")
-save "\\sbcdf060\depep02$\Bernardus\Cunha_Santos_Doornik\Dta_files\RAIS_hd_96.dta", replace
-
-
-
-*****1997
-
-clear
-#delimit ;
-
-local sql_statement
-SELECT [Município] as munic
-,[Vínculo Ativo 31 12] as active
-,[Tipo Vínculo] as emp_type
-,[Motivo Desligamento] as quit_reason
-,[Mês Desligamento] as quit_month
-,[CBO 94 Ocupação] as cbo_94
-,[Grau Instrução 2005-1985] as educ_85
-,[Sexo Trabalhador] as sex
-,[Mês Admissão] as hire_month
-,[Tempo Emprego] as emp_time
-,[PIS] as pis
-,[CNPJ Raiz] as cnpj
-,[Idade] as age
-,[CNAE 95 Classe] as cnae_95
-,[Vl Remun Dezembro (SM)] as wage_dec_sm
-,[Qtd Hora Contr] as wk_hours
-FROM [Depep].[dbo].[RAIS1997]
-WHERE [Tipo Vínculo] IN ('10', '15', '20', '25', '40', '55', '80') AND
-CAST([Vínculo Ativo 31 12] AS int) = 1
-
-;
-#delimit cr
-display in smcl as text "`sql_statement'"
-odbc load, exec("`sql_statement';") dsn("Depep")
-save "\\sbcdf060\depep02$\Bernardus\Cunha_Santos_Doornik\Dta_files\RAIS_hd_97.dta", replace
-
-
-
-*****1998
-
-clear
-#delimit ;
-
-local sql_statement
-SELECT [Município] as munic
-,[Vínculo Ativo 31 12] as active
-,[Tipo Vínculo] as emp_type
-,[Motivo Desligamento] as quit_reason
-,[Mês Desligamento] as quit_month
-,[CBO 94 Ocupação] as cbo_94
-,[Grau Instrução 2005-1985] as educ_85
-,[Sexo Trabalhador] as sex
-,[Mês Admissão] as hire_month
-,[Tempo Emprego] as emp_time
-,[PIS] as pis
-,[CNPJ Raiz] as cnpj
-,[Idade] as age
-,[CNAE 95 Classe] as cnae_95
-,[Vl Remun Dezembro (SM)] as wage_dec_sm
-,[Qtd Hora Contr] as wk_hours
-FROM [Depep].[dbo].[RAIS1998]
-WHERE [Tipo Vínculo] IN ('10', '15', '20', '25', '40', '55', '80') AND
-CAST([Vínculo Ativo 31 12] AS int) = 1
-
-;
-#delimit cr
-display in smcl as text "`sql_statement'"
-odbc load, exec("`sql_statement';") dsn("Depep")
-save "\\sbcdf060\depep02$\Bernardus\Cunha_Santos_Doornik\Dta_files\RAIS_hd_98.dta", replace
-
-
-
-*****1999
-
-clear
-#delimit ;
-
-local sql_statement
-SELECT [Município] as munic
-,[Vínculo Ativo 31 12] as active
-,[Tipo Vínculo] as emp_type
-,[Motivo Desligamento] as quit_reason
-,[Mês Desligamento] as quit_month
-,[CBO 94 Ocupação] as cbo_94
-,[Grau Instrução 2005-1985] as educ_85
-,[Sexo Trabalhador] as sex
-,[Mês Admissão] as hire_month
-,[Tempo Emprego] as emp_time
-,[PIS] as pis
-,[CNPJ Raiz] as cnpj
-,[Idade] as age
-,[CNAE 95 Classe] as cnae_95
-,[Vl Remun Dezembro (SM)] as wage_dec_sm
-,[Vl Remun Dezembro Nom] as wage_dec_nom
-,[Qtd Hora Contr] as wk_hours
-FROM [Depep].[dbo].[RAIS1999]
-WHERE [Tipo Vínculo] IN ('10', '15', '20', '25', '40', '55', '80') AND
-CAST([Vínculo Ativo 31 12] AS int) = 1
-
-;
-#delimit cr
-display in smcl as text "`sql_statement'"
-odbc load, exec("`sql_statement';") dsn("Depep")
-save "\\sbcdf060\depep02$\Bernardus\Cunha_Santos_Doornik\Dta_files\RAIS_hd_99.dta", replace
-
-
-
-*****2000
-
-clear
-#delimit ;
-
-local sql_statement
-SELECT [Município] as munic
-,[Vínculo Ativo 31 12] as active
-,[Tipo Vínculo] as emp_type
-,[Motivo Desligamento] as quit_reason
-,[Mês Desligamento] as quit_month
-,[CBO 94 Ocupação] as cbo_94
-,[Grau Instrução 2005-1985] as educ_85
-,[Sexo Trabalhador] as sex
-,[Mês Admissão] as hire_month
-,[Tempo Emprego] as emp_time
-,[PIS] as pis
-,[CNPJ Raiz] as cnpj
-,[Idade] as age
-,[CNAE 95 Classe] as cnae_95
-,[Vl Remun Dezembro (SM)] as wage_dec_sm
-,[Vl Remun Dezembro Nom] as wage_dec_nom
-,[Qtd Hora Contr] as wk_hours
-FROM [Depep].[dbo].[RAIS2000]
-WHERE [Tipo Vínculo] IN ('10', '15', '20', '25', '40', '55', '80') AND
-CAST([Vínculo Ativo 31 12] AS int) = 1
-
-;
-#delimit cr
-display in smcl as text "`sql_statement'"
-odbc load, exec("`sql_statement';") dsn("Depep")
-save "\\sbcdf060\depep02$\Bernardus\Cunha_Santos_Doornik\Dta_files\RAIS_hd_00.dta", replace
-
-
-
-*****2001
-
-clear
-#delimit ;
-
-local sql_statement
-SELECT [Município] as munic
-,[Vínculo Ativo 31 12] as active
-,[Tipo Vínculo] as emp_type
-,[Motivo Desligamento] as quit_reason
-,[Mês Desligamento] as quit_month
-,[CBO 94 Ocupação] as cbo_94
-,[Grau Instrução 2005-1985] as educ_85
-,[Sexo Trabalhador] as sex
-,[Mês Admissão] as hire_month
-,[Tempo Emprego] as emp_time
-,[PIS] as pis
-,[CNPJ Raiz] as cnpj
-,[Idade] as age
-,[CNAE 95 Classe] as cnae_95
-,[Vl Remun Dezembro (SM)] as wage_dec_sm
-,[Vl Remun Dezembro Nom] as wage_dec_nom
-,[Qtd Hora Contr] as wk_hours
-FROM [Depep].[dbo].[RAIS2001]
-WHERE [Tipo Vínculo] IN ('10', '15', '20', '25', '40', '55', '80') AND
-CAST([Vínculo Ativo 31 12] AS int) = 1
-
-;
-#delimit cr
-display in smcl as text "`sql_statement'"
-odbc load, exec("`sql_statement';") dsn("Depep")
-save "\\sbcdf060\depep02$\Bernardus\Cunha_Santos_Doornik\Dta_files\RAIS_hd_01.dta", replace
-
-
-
-*****2002 - mudança importante, checar cbo e grau instrucao e salario minomo em dezembro
-
-clear
-#delimit ;
-
-local sql_statement
-SELECT [MUNICIPIO] as munic
-,[EMP EM 31 12] as active
-,[TP VINCL] as emp_type
-,[CAUSA DESLI] as quit_reason
-,[MES DESLIG] as quit_month
-,[OCUPACAO] as cbo_94
-,[GRAU INSTR] as educ_85
-,[SEXO] as sex
-,[DT ADMISSAO] as hire_month
-,[TEMP EMPR] as emp_time
-,[PIS] as pis
-,[RADIC CNPJ] as cnpj
-,[DT NASCIMENT] as born_date
-,[CLAS CNAE 95] as cnae_95
-,[REM DEZEMBRO] as wage_dec_sm
-,[REM DEZ (R$)] as wage_dec_nom
-,[HORAS CONTR] as wk_hours
-,[CPF] as cpf
-FROM [Depep].[dbo].[RAIS2002]
-WHERE [TP VINCL] IN ('CLT R/PJ IND', 'CLT R/PF IND', 'CLT U/PJ IND', 'CLT U/PF IND', 'APREND CONTR', 'DIRETOR', 'AVULSO') 
-
-;
-#delimit cr
-display in smcl as text "`sql_statement'"
-odbc load, exec("`sql_statement';") dsn("Depep")
-save "\\sbcdf060\depep02$\Bernardus\Cunha_Santos_Doornik\Dta_files\RAIS_hd_02.dta", replace
 
 
 *****2003
@@ -408,8 +43,10 @@ SELECT [MUNICIPIO] as munic
 ,[HORAS CONTR] as wk_hours
 ,[CPF] as cpf
 ,[OCUP 2002] as cbo_02
+,[IDENTIFICAD] as cnpj_cei
+,[REM MED (R$)] as wage_mean_nom
+,[NATUR JUR] as legal_nature
 FROM [Depep].[dbo].[RAIS2003]
-WHERE [TP VINCULO] IN ('10', '15', '20', '25', '40', '55', '80') 
 
 ;
 #delimit cr
@@ -444,9 +81,10 @@ SELECT [MUNICIPIO] as munic
 ,[HORAS CONTR] as wk_hours
 ,[CPF] as cpf
 ,[OCUP 2002] as cbo_02
+,[IDENTIFICAD] as cnpj_cei
+,[REM MED (R$)] as wage_mean_nom
+,[NATUR JUR] as legal_nature
 FROM [Depep].[dbo].[RAIS2004]
-WHERE [TP VINCULO] IN ('10', '15', '20', '25', '40', '55', '80') AND
-CAST([EMP EM 31 12] AS int) = 1
 
 
 ;
@@ -483,9 +121,10 @@ SELECT [MUNICIPIO] as munic
 ,[HORAS CONTR] as wk_hours
 ,[CPF] as cpf
 ,[OCUP 2002] as cbo_02
+,[IDENTIFICAD] as cnpj_cei
+,[REM MED (R$)] as wage_mean_nom
+,[NATUR JUR] as legal_nature
 FROM [Depep].[dbo].[RAIS2005]
-WHERE [TP VINCULO] IN ('10', '15', '20', '25', '40', '55', '80') AND
-CAST([EMP EM 31 12] AS int) = 1
 
 
 ;
@@ -522,9 +161,10 @@ SELECT [MUNICIPIO] as munic
 ,[HORAS CONTR] as wk_hours
 ,[CPF] as cpf
 ,[OCUP 2002] as cbo_02
+,[IDENTIFICAD] as cnpj_cei
+,[REM MED (R$)] as wage_mean_nom
+,[NATUR JUR] as legal_nature
 FROM [Depep].[dbo].[RAIS2006]
-WHERE [TP VINCULO] IN ('10', '15', '20', '25', '40', '55', '80') AND
-CAST([EMP EM 31 12] AS int) = 1
 
 
 ;
@@ -561,9 +201,10 @@ SELECT [MUNICIPIO] as munic
 ,[HORAS CONTR] as wk_hours
 ,[CPF] as cpf
 ,[OCUP 2002] as cbo_02
+,[IDENTIFICAD] as cnpj_cei
+,[REM MED (R$)] as wage_mean_nom
+,[NATUR JUR] as legal_nature
 FROM [Depep].[dbo].[RAIS2007]
-WHERE [TP VINCULO] IN ('10', '15', '20', '25', '40', '55', '80') AND
-CAST([EMP EM 31 12] AS int) = 1
 
 
 ;
@@ -600,9 +241,10 @@ SELECT [MUNICIPIO] as munic
 ,[HORAS CONTR] as wk_hours
 ,[CPF] as cpf
 ,[OCUP 2002] as cbo_02
+,[IDENTIFICAD] as cnpj_cei
+,[REM MED (R$)] as wage_mean_nom
+,[NAT JURIDICA] as legal_nature
 FROM [Depep].[dbo].[RAIS2008]
-WHERE [TP VINCULO] IN ('10', '15', '20', '25', '40', '55', '80') AND
-CAST([EMP EM 31 12] AS int) = 1
 
 
 ;
@@ -639,9 +281,10 @@ SELECT [MUNICIPIO] as munic
 ,[HORAS CONTR] as wk_hours
 ,[CPF] as cpf
 ,[OCUP 2002] as cbo_02
+,[IDENTIFICAD] as cnpj_cei
+,[REM MED (R$)] as wage_mean_nom
+,[NAT JURIDICA] as legal_nature
 FROM [Depep].[dbo].[RAIS2009]
-WHERE [TP VINCULO] IN ('10', '15', '20', '25', '40', '55', '80') AND
-CAST([EMP EM 31 12] AS int) = 1
 
 
 ;
@@ -677,9 +320,10 @@ SELECT [MUNICIPIO] as munic
 ,[HORAS CONTR] as wk_hours
 ,[CPF] as cpf
 ,[OCUP 2002] as cbo_02
+,[IDENTIFICAD] as cnpj_cei
+,[REM MED (R$)] as wage_mean_nom
+,[NAT JURIDICA] as legal_nature
 FROM [Depep].[dbo].[RAIS2010]
-WHERE [TP VINCULO] IN ('10', '15', '20', '25', '40', '55', '80') AND
-CAST([EMP EM 31 12] AS int) = 1
 
 
 ;
@@ -715,9 +359,10 @@ SELECT [Município] as munic
 ,[Qtd Hora Contr] as wk_hours
 ,[CPF] as cpf
 ,[CBO Ocupação 2002] as cbo_02
+,[CNPJ   CEI] as cnpj_cei
+,[Vl Remun Média Nom] as wage_mean_nom
+,[Natureza Jurídica] as legal_nature
 FROM [Depep].[dbo].[RAIS2011]
-WHERE [Tipo Vínculo] IN ('10', '15', '20', '25', '40', '55', '80') AND
-CAST([Vínculo Ativo 31 12] AS int) = 1
 
 
 ;
@@ -753,9 +398,10 @@ SELECT [Município] as munic
 ,[Qtd Hora Contr] as wk_hours
 ,[CPF] as cpf
 ,[CBO Ocupação 2002] as cbo_02
+,[CNPJ   CEI] as cnpj_cei
+,[Vl Remun Média Nom] as wage_mean_nom
+,[Natureza Jurídica] as legal_nature
 FROM [Depep].[dbo].[RAIS2012]
-WHERE [Tipo Vínculo] IN ('10', '15', '20', '25', '40', '55', '80') AND
-CAST([Vínculo Ativo 31 12] AS int) = 1
 
 ;
 #delimit cr
@@ -791,9 +437,10 @@ SELECT [Município] as munic
 ,[CPF] as cpf
 ,[CBO Ocupação 2002] as cbo_02
 ,[idade] as age
+,[CNPJ   CEI] as cnpj_cei
+,[Vl Remun Média Nom] as wage_mean_nom
+,[Natureza Jurídica] as legal_nature
 FROM [Depep].[dbo].[RAIS2013]
-WHERE [Tipo Vínculo] IN ('10', '15', '20', '25', '40', '55', '80') AND
-CAST([Vínculo Ativo 31 12] AS int) = 1
 
 ;
 #delimit cr
@@ -830,9 +477,10 @@ SELECT [Município] as munic
 ,[CBO Ocupação 2002] as cbo_02
 ,[idade] as age
 ,[Data de Nascimento] as born_date
+,[CNPJ   CEI] as cnpj_cei
+,[Vl Remun Média Nom] as wage_mean_nom
+,[Natureza Jurídica] as legal_nature
 FROM [Depep].[dbo].[RAIS2014]
-WHERE [Tipo Vínculo] IN ('10', '15', '20', '25', '40', '55', '80') AND
-CAST([Vínculo Ativo 31 12] AS int) = 1
 
 ;
 #delimit cr
@@ -869,9 +517,10 @@ SELECT [Município] as munic
 ,[CBO Ocupação 2002] as cbo_02
 ,[Idade] as age
 ,[Data de Nascimento] as born_date
+,[CNPJ   CEI] as cnpj_cei
+,[Vl Remun Média Nom] as wage_mean_nom
+,[Natureza Jurídica] as legal_nature
 FROM [Depep].[dbo].[RAIS2015]
-WHERE [Tipo Vínculo] IN ('10', '15', '20', '25', '40', '55', '80') AND
-CAST([Vínculo Ativo 31 12] AS int) = 1
 
 ;
 #delimit cr
@@ -908,9 +557,10 @@ SELECT [municipio] as munic
 ,[cboocupacao2002] as cbo_02
 ,[idade] as age
 ,[datadenascimento] as born_date
+,[cnpjcei] as cnpj_cei
+,[vlremunmedianom] as wage_mean_nom
+,[naturezajuridica] as legal_nature
 FROM [Depep].[dbo].[RAIS2016]
-WHERE [tipovinculo] IN ('10', '15', '20', '25', '40', '55', '80') AND
-CAST([vinculoativo3112] AS int) = 1
 
 ;
 #delimit cr
@@ -947,9 +597,10 @@ SELECT [municipio] as munic
 ,[cboocupacao2002] as cbo_02
 ,[idade] as age
 ,[datadenascimento] as born_date
+,[cnpjcei] as cnpj_cei
+,[vlremunmedianom] as wage_mean_nom
+,[naturezajuridica] as legal_nature
 FROM [Depep].[dbo].[RAIS2017]
-WHERE [tipovinculo] IN ('10', '15', '20', '25', '40', '55', '80') AND
-CAST([vinculoativo3112] AS int) = 1
 
 ;
 #delimit cr
@@ -986,9 +637,10 @@ SELECT [municipio] as munic
 ,[cboocupacao2002] as cbo_02
 ,[idade] as age
 ,[datadenascimento] as born_date
+,[cnpjcei] as cnpj_cei
+,[vlremunmedianom] as wage_mean_nom
+,[naturezajuridica] as legal_nature
 FROM [Depep].[dbo].[RAIS2018]
-WHERE [tipovinculo] IN ('10', '15', '20', '25', '40', '55', '80') AND
-CAST([vinculoativo3112] AS int) = 1
 
 ;
 #delimit cr
@@ -1025,9 +677,10 @@ SELECT [municipio] as munic
 ,[cboocupacao2002] as cbo_02
 ,[idade] as age
 ,[datadenascimento] as born_date
+,[cnpjcei] as cnpj_cei
+,[vlremunmedianom] as wage_mean_nom
+,[naturezajuridica] as legal_nature
 FROM [Depep].[dbo].[RAIS2019]
-WHERE [tipovinculo] IN ('10', '15', '20', '25', '40', '55', '80') AND
-CAST([vinculoativo3112] AS int) = 1
 
 ;
 #delimit cr
@@ -1064,10 +717,10 @@ SELECT  [municipio] as munic
 ,[cboocupacao2002] as cbo_02
 ,[idade] as age
 ,[datadenascimento] as born_date
+,[cnpjcei] as cnpj_cei
+,[vlremunmedianom] as wage_mean_nom
+,[naturezajuridica] as legal_nature
 FROM [Depep].[dbo].[RAIS2020]
-WHERE 
-[tipovinculo] IN ('10', '15', '20', '25', '40', '55', '80') AND
-CAST([vinculoativo3112] AS int) = 1
 
 ;
 #delimit cr
@@ -1104,9 +757,10 @@ SELECT [municipio] as munic
 ,[cboocupacao2002] as cbo_02
 ,[idade] as age
 ,[datadenascimento] as born_date
+,[cnpjcei] as cnpj_cei
+,[vlremunmedianom] as wage_mean_nom
+,[naturezajuridica] as legal_nature
 FROM [Depep].[dbo].[RAIS2021]
-WHERE [tipovinculo] IN ('10', '15', '20', '25', '40', '55', '80') AND
-CAST([vinculoativo3112] AS int) = 1
 
 ;
 #delimit cr

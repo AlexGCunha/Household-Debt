@@ -17,9 +17,10 @@ if (!require("ggplot2")) install.packages("splitstackshape", repos = repository)
 if (!require("readr")) install.packages("splitstackshape", repos = repository)
 if (!require("purrr")) install.packages("splitstackshape", repos = repository)
 
-# library(tidyverse)
-# library(haven) 
-# library(arrow)
+library(tidyverse)
+library(haven)
+library(arrow)
+library(readxl)
 
 data_path = "Z:/Bernardus/Cunha_Santos_Doornik/Dta_files"
 output_path = "Z:/Bernardus/Cunha_Santos_Doornik/Output_check"
@@ -27,672 +28,230 @@ scr_path = "Z:/DATA/Dta_files/SCR_TERADATA"
 a = Sys.time()
 setwd(data_path)
 
-#Set parameters
-sex_use = c(1)
-min_age = 24
-max_age = 50
+initial_year = 2003
+final_year = 2019
+
+#aux df with deflators
+df_br = read_excel("series_nacionais.xlsx", sheet = 'anual') %>% 
+  select(ano, deflator_2010_t) %>% 
+  rename(deflator = deflator_2010_t)
 
 ###################################
 #Print structure of each downloaded database
 ###################################
-for (i in c(1997:2021)){
-  year = substr(i, 3,4)
+for (y in c(2003:2007)){
+  year = substr(y, 3,4)
   filename = paste0("RAIS_hd_",year,".dta")
   df = read_dta(filename) %>% 
-    mutate(ano = i)
+    mutate(ano = y) %>% 
+    select(-any_of(c("cpf", "pis", "cnpj", "cnpj_cei")))
   
-  print(summary(df))
+  print(str(df))
 }
 rm(df)
 gc()
 
 ###################################
-#1994-2001
+#Clean datasets
 ###################################
-for (i in c(1994:2001)){
+
+for (y in c(initial_year:final_year)){
+  b = Sys.time()
   #Open file and filter individuals who were working in December
-  year = substr(i, 3,4)
-  filename = paste0("RAIS_hd_",year,".dta")
-  df <- read_dta(filename) %>%
-    mutate(active = as.integer(active)) %>%
-    filter(active == 1)
-
-  #print total formal workers in that year
-  n_workers = nrow(df)
-  message = paste0('Formal CLT workers in ', i, ': ', n_workers)
-  print(message)
-
-  #correct some numeric variables that have a "," as decimal separator
-  # variables <- c("emp_time", "wage_dec_sm")
-  # df <- df %>%
-  #   mutate(across(all_of(variables),as.character)) %>%
-  #   mutate(across(all_of(variables),~str_replace_all(.,"[.]",""))) %>%
-  #   mutate(across(all_of(variables),~str_replace_all(.,"[,]",".")))
-
-  #convert columns
-  int_cols = c("munic","emp_type","quit_reason","quit_month",
-               "educ_85","sex","hire_month","age","cnae_95",
-               "wk_hours")
-  continuous_cols <- c("emp_time", "wage_dec_sm")
-  char_cols = c("cbo_94","pis","cnpj")
-
-  df <- df %>%
-    mutate(across(all_of(int_cols), as.integer)) %>%
-    mutate(across(all_of(continuous_cols), as.numeric)) %>%
-    mutate(across(all_of(char_cols), as.character))
-
-  #create some education dummies
-  df <- df %>%
-    mutate(educ_fund = ifelse(educ_85 >=5,1,0),
-           educ_hs = ifelse(educ_85 >= 7,1,0),
-           educ_col = ifelse(educ_85 >= 9,1,0))
-
-  #drop unnecessary columns
-  df <- df %>%
-    select(!any_of(c("active","wage_dec_nom", "educ_85","educ", "born_date",
-                     "nc")))
-
-  #Add columns
-  df<- df %>%
-    mutate(cpf = rep(NA, nrow(df)),
-           color = rep(NA, nrow(df)),
-           cbo_02 = rep(NA, nrow(df)),
-           ano = i)
-
-  #Save
-  filename = paste0("RAIS_comp_",year,".parquet")
-  write_parquet(df, filename)
-
-  print(i)
-  print(summary(df))
-
-}
-
-###################################
-#2002
-###################################
-for (i in c(2002:2002)){
-  #Open file and filter individuals who were working in December
-  year = substr(i, 3,4)
+  year = substr(y, 3,4)
   filename = paste0("RAIS_hd_",year,".dta")
   df = read_dta(filename)
-
-  #in this year, we didnt filter active individuals in SQL, so lets see
-  #the unique values
-  aux_values = sort(unique(df$active))
-  unique_2002 = ""
-  for (value in aux_values) unique_2002 = paste(unique_2002, value, sep = ", ")
-  message = paste0("Distinct values for 'active' column in 2002: ", unique_2002)
-  print(message)
-
-  #Filter active individuals
-  df = df %>%
-    mutate(active = as.integer(active)) %>%
-    filter(active == 1)
-
+  rm(filename)
+  
+  #create year column
+  df = df %>% mutate(ano = y)
+  
+  #convert active to integer
+  df = df %>% mutate(active = as.integer(active))
+  
+  #convert cpf and cnpj to numeric
+  df = df %>% 
+    mutate(across(c("cpf", "cnpj_cei", "cnpj"), as.numeric))
+  
   #print total formal workers in that year
-  n_workers = nrow(df)
-  message = paste0('Formal CLT workers in ', i, ': ', n_workers)
-  print(message)
-
-  #correct some numeric variables that have a "," as decimal separator
-  # variables <- c("emp_time", "wage_dec_sm")
-  # df <- df %>%
-  #   mutate(across(all_of(variables),as.character)) %>%
-  #   mutate(across(all_of(variables),~str_replace_all(.,"[.]",""))) %>%
-  #   mutate(across(all_of(variables),~str_replace_all(.,"[,]",".")))
-
-  #convert columns
-  int_cols = c("munic","emp_type","quit_reason","quit_month",
-               "educ_85","sex","hire_month","cnae_95",
-               "wk_hours")
-  continuous_cols <- c("emp_time", "wage_dec_sm")
-  char_cols = c("cbo_94","pis","cnpj", "cpf")
-
-  df <- df %>%
-    mutate(across(all_of(int_cols), as.integer)) %>%
-    mutate(across(all_of(continuous_cols), as.numeric)) %>%
-    mutate(across(all_of(char_cols), as.character))
-
-
-  #Correct born_date and create age
-  df <- df %>%
-    mutate(born_date = as.character(born_date),
-           nc = nchar(born_date)) %>%
-    mutate(born_date = case_when(nc == 8 ~ born_date,
-                                 nc == 7 ~paste0(0,born_date),
-                                 T ~ NA_character_)) %>%
-    mutate(born_date = as.Date(born_date, format = "%d%m%Y"))
-
-  date_comparison = as.Date(paste0("3112",i), format = "%d%m%Y")
-
-  df <- df %>%
-    mutate(age = as.integer(floor(date_comparison - born_date)/365))
-
-
-  #create some education dummies
-  df <- df %>%
-    mutate(educ_fund = ifelse(educ_85 >=5,1,0),
-           educ_hs = ifelse(educ_85 >= 7,1,0),
-           educ_col = ifelse(educ_85 >= 9,1,0))
-
-  #drop unnecessary columns
-  df <- df %>%
-    select(!any_of(c("active","wage_dec_nom", "educ_85","educ", "born_date",
-                     "nc")))
-
-  #Add columns
-  df<- df %>%
-    mutate(color = rep(NA, nrow(df)),
-           cbo_02 = rep(NA, nrow(df)),
-           ano = i)
-
-  #Save
-  filename = paste0("RAIS_comp_",year,".parquet")
-  write_parquet(df, filename)
-
-  print(i)
-  print(summary(df))
-
-}
-
-
-###################################
-#2003-2005
-###################################
-for (i in c(2003:2005)){
-  #Open file and filter individuals who were working in December
-  year = substr(i, 3,4)
-  filename = paste0("RAIS_hd_",year,".dta")
-  df = read_dta(filename)
-
-  if(i == 2003){
-    #in this year, we didnt filter active individuals in SQL, so lets see
-    #the unique values
-    aux_values = sort(unique(df$active))
-    unique_2003 = ""
-    for (value in aux_values) unique_2003 = paste(unique_2003, value,
-                                                  sep = ", ")
-    message = paste0("Distinct values for 'active' column in 2003: ",
-                     unique_2003)
-    print(message)
+  n_workers = df %>% filter(active == 1) %>% count() %>% pull()
+  print(paste0("Formal Workers in ", y, ": ", n_workers))
+  
+  #Fix sex
+  df = df %>% 
+    mutate(sex = as.character(sex),
+           sex = case_when(sex == "MASCULINO" ~ 1,
+                           sex == "1" ~ 1,
+                           sex == "01" ~ 1,
+                           sex == "FEMININO" ~ 0,
+                           sex == "2" ~ 0,
+                           sex == "02" ~ 0,
+                           T ~ NA),
+           sex = as.integer(sex))
+  
+  #fix earnings
+  df = df %>% 
+    mutate(wage_mean_nom = as.character(wage_mean_nom),
+           wage_mean_nom = str_replace(wage_mean_nom,
+                                       "[,]", "."),
+           wage_mean_nom = as.numeric(wage_mean_nom))
+  
+  #create real earnings
+  df = df %>% 
+    left_join(df_br, by = "ano", na_matches = "never") %>% 
+    mutate(real_earnings = wage_mean_nom * deflator) %>% 
+    select(-c("wage_mean_nom", "deflator"))
+  
+  #convert some variables to integer
+  df= df %>% 
+    mutate(across(c("emp_type", "quit_reason", "wk_hours"), 
+                  as.integer))
+  
+  #Fix emp Time
+  df = df %>% 
+    mutate(emp_time = as.character(emp_time),
+           emp_time = str_replace(emp_time,
+                                  "[,]", "."),
+           emp_time = as.numeric(emp_time))
+  
+  #Confirm if cnae has the correct number of digits
+  df = df %>% 
+    mutate(cnae_95 = as.character(cnae_95),
+           nc_cnae = nchar(cnae_95),
+           cnae_95 = case_when(nc_cnae == 5 ~ cnae_95,
+                               nc_cnae == 4 ~ paste0("0", cnae_95),
+                               T ~ cnae_95),
+    )
+  
+  #convert munic to numeric
+  df = df %>% 
+    mutate(munic = as.numeric(munic))
+  
+  #fix educ column name
+  if(("educ_85" %in% colnames(df)) & !("educ" %in% colnames(df))){
+    df = df %>% 
+      rename(educ = educ_85)
   }
-
-  #Filter active individuals
-  df = df %>%
-    mutate(active = as.integer(active)) %>%
-    filter(active == 1)
-
-  #print total formal workers in that year
-  n_workers = nrow(df)
-  message = paste0('Formal CLT workers in ', i, ': ', n_workers)
-  print(message)
-
-  #correct some numeric variables that have a "," as decimal separator
-  # variables <- c("emp_time", "wage_dec_sm")
-  # df <- df %>%
-  #   mutate(across(all_of(variables),as.character)) %>%
-  #   mutate(across(all_of(variables),~str_replace_all(.,"[.]",""))) %>%
-  #   mutate(across(all_of(variables),~str_replace_all(.,"[,]",".")))
-
-  #convert columns
-  int_cols = c("munic","emp_type","quit_reason","quit_month",
-               "educ_85","sex","hire_month","cnae_95",
-               "wk_hours", "color")
-  continuous_cols <- c("emp_time", "wage_dec_sm")
-  char_cols = c("cbo_94","pis","cnpj", "cpf", "cbo_02")
-
-  df <- df %>%
-    mutate(across(all_of(int_cols), as.integer)) %>%
-    mutate(across(all_of(continuous_cols), as.numeric)) %>%
-    mutate(across(all_of(char_cols), as.character))
-
-
-  #Correct born_date and create age
-  df <- df %>%
-    mutate(born_date = as.character(born_date),
-           nc = nchar(born_date)) %>%
-    mutate(born_date = case_when(nc == 8 ~ born_date,
-                                 nc == 7 ~paste0(0,born_date),
-                                 T ~ NA_character_)) %>%
-    mutate(born_date = as.Date(born_date, format = "%d%m%Y"))
-
-  date_comparison = as.Date(paste0("3112",i), format = "%d%m%Y")
-
-  df <- df %>%
-    mutate(age = as.integer(floor(date_comparison - born_date)/365))
-
-
-  #create some education dummies
-  df <- df %>%
-    mutate(educ_fund = ifelse(educ_85 >=5,1,0),
-           educ_hs = ifelse(educ_85 >= 7,1,0),
-           educ_col = ifelse(educ_85 >= 9,1,0))
-
-  #drop unnecessary columns
-  df <- df %>%
-    select(!any_of(c("active","wage_dec_nom", "educ_85","educ", "born_date",
-                     "nc")))
-
-  df <- df %>%
-    mutate(ano = i)
-
-  #Save
-  filename = paste0("RAIS_comp_",year,".parquet")
-  write_parquet(df, filename)
-
-  print(i)
-  print(summary(df))
-
-}
-
-###################################
-#2006-2009
-###################################
-for (i in c(2006:2009)){
-  #Open file and filter individuals who were working in December
-  year = substr(i, 3,4)
-  filename = paste0("RAIS_hd_",year,".dta")
-  df <- read_dta(filename) %>%
-    mutate(active = as.integer(active)) %>%
-    filter(active == 1)
-
-  #print total formal workers in that year
-  n_workers = nrow(df)
-  message = paste0('Formal CLT workers in ', i, ': ', n_workers)
-  print(message)
-
-  #correct some numeric variables that have a "," as decimal separator
-  # variables <- c("emp_time", "wage_dec_sm")
-  # df <- df %>%
-  #   mutate(across(all_of(variables),as.character)) %>%
-  #   mutate(across(all_of(variables),~str_replace_all(.,"[.]",""))) %>%
-  #   mutate(across(all_of(variables),~str_replace_all(.,"[,]",".")))
-
-  #convert columns
-  int_cols = c("munic","emp_type","quit_reason","quit_month",
-               "sex","hire_month","cnae_95",
-               "wk_hours", "color", "educ")
-  continuous_cols <- c("emp_time", "wage_dec_sm")
-  char_cols = c("cbo_94","pis","cnpj", "cpf", "cbo_02")
-
-  df <- df %>%
-    mutate(across(all_of(int_cols), as.integer)) %>%
-    mutate(across(all_of(continuous_cols), as.numeric)) %>%
-    mutate(across(all_of(char_cols), as.character))
-
-
-  #Correct born_date and create age
-  df <- df %>%
-    mutate(born_date = as.character(born_date),
-           nc = nchar(born_date)) %>%
-    mutate(born_date = case_when(nc == 8 ~ born_date,
-                                 nc == 7 ~paste0(0,born_date),
-                                 T ~ NA_character_)) %>%
-    mutate(born_date = as.Date(born_date, format = "%d%m%Y"))
-
-  date_comparison = as.Date(paste0("3112",i), format = "%d%m%Y")
-
-  df <- df %>%
-    mutate(age = as.integer(floor(date_comparison - born_date)/365))
-
-
-  #create some education dummies
-  df <- df %>%
-    mutate(educ_fund = ifelse(educ >=5,1,0),
-           educ_hs = ifelse(educ >= 7,1,0),
-           educ_col = ifelse(educ >= 9,1,0))
-
-  #drop unnecessary columns
-  df <- df %>%
-    select(!any_of(c("active","wage_dec_nom", "educ_85","educ", "born_date",
-                     "nc")))
-
-  #Add columns
-  df <- df %>%
-    mutate(ano = i)
-
-  #Save
-  filename = paste0("RAIS_comp_",year,".parquet")
-  write_parquet(df, filename)
-
-  print(i)
-  print(summary(df))
-
-}
-
-
-###################################
-#2010
-###################################
-for (i in c(2010:2010)){
-  #Open file and filter individuals who were working in December
-  year = substr(i, 3,4)
-  filename = paste0("RAIS_hd_",year,".dta")
-  df <- read_dta(filename) %>%
-    mutate(active = as.integer(active)) %>%
-    filter(active == 1)
-
-  #print total formal workers in that year
-  n_workers = nrow(df)
-  message = paste0('Formal CLT workers in ', i, ': ', n_workers)
-  print(message)
-
-  #correct some numeric variables that have a "," as decimal separator
-  # variables <- c("emp_time", "wage_dec_sm")
-  # df <- df %>%
-  #   mutate(across(all_of(variables),as.character)) %>%
-  #   mutate(across(all_of(variables),~str_replace_all(.,"[.]",""))) %>%
-  #   mutate(across(all_of(variables),~str_replace_all(.,"[,]",".")))
-
-  #convert columns
-  int_cols = c("munic","emp_type","quit_reason","quit_month",
-               "sex","hire_month","cnae_95",
-               "wk_hours", "color", "educ")
-  continuous_cols <- c("emp_time", "wage_dec_sm")
-  char_cols = c("cbo_94","cnpj", "cpf", "cbo_02")
-
-  df <- df %>%
-    mutate(across(all_of(int_cols), as.integer)) %>%
-    mutate(across(all_of(continuous_cols), as.numeric)) %>%
-    mutate(across(all_of(char_cols), as.character))
-
-
-  #Correct born_date and create age
-  df <- df %>%
-    mutate(born_date = as.character(born_date),
-           nc = nchar(born_date)) %>%
-    mutate(born_date = case_when(nc == 8 ~ born_date,
-                                 nc == 7 ~paste0(0,born_date),
-                                 T ~ NA_character_)) %>%
-    mutate(born_date = as.Date(born_date, format = "%d%m%Y"))
-
-  date_comparison = as.Date(paste0("3112",i), format = "%d%m%Y")
-
-  df <- df %>%
-    mutate(age = as.integer(floor(date_comparison - born_date)/365))
-
-
-  #create some education dummies
-  df <- df %>%
-    mutate(educ_fund = ifelse(educ >=5,1,0),
-           educ_hs = ifelse(educ >= 7,1,0),
-           educ_col = ifelse(educ >= 9,1,0))
-
-  #drop unnecessary columns
-  df <- df %>%
-    select(!any_of(c("active","wage_dec_nom", "educ_85","educ", "born_date",
-                     "nc")))
-
-  #Add columns
-  df<- df %>%
-    mutate(pis = rep(NA, nrow(df)),
-           ano = i)
-
-  #Save
-  filename = paste0("RAIS_comp_",year,".parquet")
-  write_parquet(df, filename)
-
-  print(i)
-  print(summary(df))
-
-}
-
-
-###################################
-#2011-2012
-###################################
-for (i in c(2011:2012)){
-  #Open file and filter individuals who were working in December
-  year = substr(i, 3,4)
-  filename = paste0("RAIS_hd_",year,".dta")
-  df <- read_dta(filename) %>%
-    mutate(active = as.integer(active)) %>%
-    filter(active == 1)
-
-  #print total formal workers in that year
-  n_workers = nrow(df)
-  message = paste0('Formal CLT workers in ', i, ': ', n_workers)
-  print(message)
-
-  #correct some numeric variables that have a "," as decimal separator
-  # variables <- c("emp_time", "wage_dec_sm")
-  # df <- df %>%
-  #   mutate(across(all_of(variables),as.character)) %>%
-  #   mutate(across(all_of(variables),~str_replace_all(.,"[.]",""))) %>%
-  #   mutate(across(all_of(variables),~str_replace_all(.,"[,]",".")))
-
-  #convert columns
-  int_cols = c("munic","emp_type","quit_reason","quit_month",
-               "sex","hire_month","cnae_95",
-               "wk_hours", "color", "educ")
-  continuous_cols <- c("emp_time", "wage_dec_sm")
-  char_cols = c("cbo_94","pis","cnpj", "cpf", "cbo_02")
-
-  df <- df %>%
-    mutate(across(all_of(int_cols), as.integer)) %>%
-    mutate(across(all_of(continuous_cols), as.numeric)) %>%
-    mutate(across(all_of(char_cols), as.character))
-
-
-  #create some education dummies
-  df <- df %>%
-    mutate(educ_fund = ifelse(educ >=5,1,0),
-           educ_hs = ifelse(educ >= 7,1,0),
-           educ_col = ifelse(educ >= 9,1,0))
-
-  #drop unnecessary columns
-  df <- df %>%
-    select(!any_of(c("active","wage_dec_nom", "educ_85","educ", "born_date",
-                     "nc")))
-
-
-  #Add columns
-  df<- df %>%
-    mutate(age = rep(NA, nrow(df)),
-           ano = i)
-
-  #Save
-  filename = paste0("RAIS_comp_",year,".parquet")
-  write_parquet(df, filename)
-
-  print(i)
-  print(summary(df))
-
-}
-
-
-###################################
-#2013-2021
-###################################
-for (i in c(2013:2021)){
-  #Open file and filter individuals who were working in December
-  year = substr(i, 3,4)
-  filename = paste0("RAIS_hd_",year,".dta")
-  df <- read_dta(filename) %>%
-    mutate(active = as.integer(active)) %>%
-    filter(active == 1)
-
-  #print total formal workers in that year
-  n_workers = nrow(df)
-  message = paste0('Formal CLT workers in ', i, ': ', n_workers)
-  print(message)
-
-  #correct some numeric variables that have a "," as decimal separator
-  # variables <- c("emp_time", "wage_dec_sm")
-  # df <- df %>%
-  #   mutate(across(all_of(variables),as.character)) %>%
-  #   mutate(across(all_of(variables),~str_replace_all(.,"[.]",""))) %>%
-  #   mutate(across(all_of(variables),~str_replace_all(.,"[,]",".")))
-
-  #convert columns
-  int_cols = c("munic","emp_type","quit_reason","quit_month",
-               "sex","hire_month","age","cnae_95",
-               "wk_hours", "color", "educ")
-  continuous_cols <- c("emp_time", "wage_dec_sm")
-  char_cols = c("cbo_94","pis","cnpj", "cpf", "cbo_02")
-
-  df <- df %>%
-    mutate(across(all_of(int_cols), as.integer)) %>%
-    mutate(across(all_of(continuous_cols), as.numeric)) %>%
-    mutate(across(all_of(char_cols), as.character))
-
-
-  #create some education dummies
-  df <- df %>%
-    mutate(educ_fund = ifelse(educ >=5,1,0),
-           educ_hs = ifelse(educ >= 7,1,0),
-           educ_col = ifelse(educ >= 9,1,0))
-
-  #drop unnecessary columns
-  df <- df %>%
-    select(!any_of(c("active","wage_dec_nom", "educ_85","educ", "born_date",
-                     "nc")))
-
-  #Add columns
-  df = df %>%
-    mutate (ano = i)
-
-
-  #Save
-  filename = paste0("RAIS_comp_",year,".parquet")
-  write_parquet(df, filename)
-
-  print(i)
-  print(summary(df))
-
-}
-
-
-b = Sys.time()
-print(b-a)
-
-###################################
-#Pis correction for 2010
-###################################
-#Create a unique file with pis x cpf correspondance
-df_pis = tibble()
-for (i in c(2002:2009, 2011:2021)){
-  #Open file
-  year = substr(i, 3,4)
-  filename = paste0("RAIS_comp_",year,".parquet")
-  df_aux <- read_parquet(filename) %>%
-    filter(!is.na(pis) & !is.na(cpf)) %>%
-    group_by(cpf) %>%
-    summarise(pis_aux = first(pis)) %>%
-    ungroup() %>%
-    mutate(ano_aux = i)
-
-  #aggregate and remove duplicates picking the most recent one
-  df_pis = rbind(df_pis, df_aux) %>%
-    group_by(pis_aux) %>%
-    filter(ano_aux == max(ano_aux)) %>%
-    ungroup()
-}
-
-df_pis = df_pis %>%
-  select(!ano_aux)
-
-#update pis information for 2010
-for (i in c(2010)){
-  #Open file
-  year = substr(i, 3,4)
-  filename = paste0("RAIS_comp_",year,".parquet")
-  df_aux <- read_parquet(filename) %>%
-    left_join(df_pis, by = 'cpf', na_matches = 'never') %>%
-    mutate(pis = pis_aux) %>%
-    select(!c(pis_aux))
-
-  #Update file
-  write_parquet(df_aux, filename)
-
-}
-
-rm(df_pis, df_aux)
-
-###################################
-#Age correction for 2011 and 2012
-###################################
-#Create a unique file with everyones age
-df_age = tibble()
-for (i in c(2002:2010, 2013:2015)){
-  #Open file
-  year = substr(i, 3,4)
-  filename = paste0("RAIS_comp_",year,".parquet")
-  df_aux <- read_parquet(filename) %>%
-    filter(!is.na(age)) %>%
-    group_by(pis) %>%
-    summarise(age_aux = first(age)) %>%
-    ungroup() %>%
-    mutate(ano_aux = i)
-
-  #aggregate and remove duplicates
-  df_age = rbind(df_age, df_aux) %>%
-    group_by(pis) %>%
-    filter(ano_aux == max(ano_aux)) %>%
-    ungroup()
-}
-
-#update age information for 2011 and 2012
-for (i in c(2011:2012)){
-  #Open file
-  year = substr(i, 3,4)
-  filename = paste0("RAIS_comp_",year,".parquet")
-  df_aux <- read_parquet(filename) %>%
-    left_join(df_age, by = 'pis', na_matches = 'never') %>%
-    mutate(age = ano - ano_aux + age_aux) %>%
-    select(!c(ano_aux, age_aux))
-
-  #Update file
-  write_parquet(df_aux, filename)
-
-}
-rm(df_age, df_aux)
-
-###################################
-#Additional modifications
-###################################
-#take a list of columns we want (the same across every year)
-columns_to_keep = read_parquet('RAIS_comp_94.parquet') %>% 
-  select(!any_of(c("active", "emp_type"))) %>% 
-  colnames()
-
-for (i in c(1994:2021)){
-  #Open file
-  year = substr(i, 3,4)
-  filename = paste0("RAIS_comp_",year,".parquet")
-  df_aux = read_parquet(filename) %>% 
+  
+  df = df %>% mutate(educ = as.integer(educ))
+  
+  #For years we dont have age, but do have born_date, calculate age
+  if(!("age" %in% colnames(df)) & ("born_date" %in% colnames(df))){
+    df = df %>%
+      mutate(born_date = as.character(born_date),
+             nc = nchar(born_date),
+             born_date = case_when(nc == 8 ~ born_date,
+                                   nc == 7 ~paste0(0,born_date),
+                                   T ~ NA_character_),
+             born_date = as.Date(born_date, format = "%d%m%Y")) 
+    
+    date_comparison = as.Date(paste0("3112",y), format = "%d%m%Y")
+    
+    df = df %>%
+      mutate(age = as.integer(floor(date_comparison - born_date)/365))
+  }
+  
+  #In 2011 and 2012, we dont have info on neither age nor born date,
+  #lets inpute age based on previous years (since we look at individuals with
+  #at least 3 years of tenure, this shouldn't be a problem)
+  
+  if(!("age" %in% colnames(df)) & !("born_date" %in% colnames(df))){
+    #placeholder
+    df = df %>% mutate(age = NA_integer_)
+    
+    #get info from previous years
+    for (rel_data in (1:3)){
+      rel_year = y - rel_data
+      filename = paste0("rais_clean_", rel_year, ".parquet")
+      sub_df = read_parquet(filename)
+      sub_df = sub_df %>% 
+        select(cpf, age) %>% 
+        mutate(age = age + rel_data)
+      
+      suffix_aux = paste0("_", rel_data)
+      
+      #merge
+      df = df %>% 
+        left_join(sub_df, by = c("cpf"), suffix = c("", suffix_aux))
+      
+      rm(rel_year, filename, sub_df, suffix_aux)
+    }
+    
+    #Take the mean of ages we've found
+    df = df %>% 
+      mutate(age_t = rowMeans(select(df, c(age_1, age_2, age_3)), na.rm = T),
+             age = ifelse(is.nan(age_t), NA_real_, age_t),
+             age = round(age)) %>% 
+      select(-c("age_1", "age_2", "age_3"))
+  }
+  
+  #convert age to integer
+  df = df %>% mutate(age = as.integer(age))
+  
+  #FIX CBO
+  df = df %>% 
+    mutate(cbo_02 = as.character(cbo_02),
+           cbo_02 = str_replace_all(cbo_02, "CBO", ""),
+           cbo_02 = str_replace_all(cbo_02, " ", ""),
+           nc_cbo = nchar(cbo_02),
+           cbo_02 = case_when(nc_cbo == 6 ~ cbo_02,
+                              nc_cbo == 5 ~ paste0(0, cbo_02),
+                              T ~cbo_02),
+    ) %>% 
+    select(-c(nc_cbo))
+  
+  #convert legal nature to integer
+  df = df %>% mutate(legal_nature = as.integer(legal_nature))
+  
+  #get hire year (in 2011, dates are in reverse order)
+  if (y != 2011){
+    df = df %>% 
+      mutate(hire_month = as.character(hire_month),
+             nc = nchar(hire_month),
+             hire_month = case_when(nc == 8 ~ hire_month,
+                                    nc == 7 ~paste0(0,hire_month),
+                                    T ~ NA_character_),
+             hire_month = as.Date(hire_month, format = "%d%m%Y"),
+             hire_year = format(hire_month, "%Y"),
+             hire_year = as.integer(hire_year)) %>% 
+      select(-c("hire_month", "nc"))
+    
+  } else{
+    df = df %>% 
+      mutate(hire_month = as.character(hire_month),
+             hire_year = substr(hire_month, 1, 4),
+             hire_year = as.integer(hire_year)) %>% 
+      select(-c("hire_month"))
+  }
+  
+  #select only columns we need
+  columns_to_keep = c("cpf", "ano", "cnpj_cei", "cnpj", "active", "sex",
+                      "real_earnings", "emp_type", "quit_reason", "wk_hours", 
+                      "emp_time","cnae_95", "munic", "educ", "age", 
+                      "cbo_02","legal_nature", "hire_month")
+  
+  df = df %>% 
     select(all_of(columns_to_keep)) %>% 
-    #drop observations without cnpj
-    filter(!is.na(cnpj)) %>% 
-    #filter characteristics we want
-    filter(age >= min_age,
-           age <= max_age)
+    rename(year = ano)
   
-  #Inpute subscript _t for every column that is not pis and ano
-  df_aux = df_aux %>% select(pis, ano, everything())
-  cols = colnames(df_aux)[3:ncol(df_aux)]
-  cols = paste0(cols, '_t')
-  cols = c('pis', 'ano', cols)
-  colnames(df_aux) = cols
+  #Save
+  filename = paste0("rais_clean_", y, ".parquet")
+  write_parquet(df, filename)
   
-  #Update file
-  filename = paste0("RAIS_comp_filt_",year,".parquet")
-  write_parquet(df_aux, filename)
-  
-  #Print number of workers per year
-  n_workers = nrow(df_aux)
-  message = paste0('Workers in ', i, ' after cleaning: ', n_workers)
+  c = Sys.time()
+  message = paste0("Time to clean ", y, " dataset: ",
+                   round(difftime(c, b, unit = "mins")), " minutes")
   print(message)
-  print(summary(df_aux))  
+  print(summary(df))
+  
+  rm(df)
+  gc()
+  
 }
 
-
-b = Sys.time()
-message = paste0('Time to clean yearly datasets: ', 
-                 round(difftime(b, a, units = 'hours'),1), ' hours')
+c = Sys.time()
+message = paste0("Time to clean all dataset: ",
+                 round(difftime(c, a, unit = "hours"),1), " hours")
 print(message)
 
-rm(list = ls())
-gc()
 
