@@ -37,21 +37,6 @@ df_br = read_excel("series_nacionais.xlsx", sheet = 'anual') %>%
   rename(deflator = deflator_2010_t)
 
 ###################################
-#Print structure of each downloaded database
-###################################
-for (y in c(2003:2007)){
-  year = substr(y, 3,4)
-  filename = paste0("RAIS_hd_",year,".dta")
-  df = read_dta(filename) %>% 
-    mutate(ano = y) %>% 
-    select(-any_of(c("cpf", "pis", "cnpj", "cnpj_cei")))
-  
-  print(str(df))
-}
-rm(df)
-gc()
-
-###################################
 #Clean datasets
 ###################################
 
@@ -166,13 +151,18 @@ for (y in c(initial_year:final_year)){
       sub_df = read_parquet(filename)
       sub_df = sub_df %>% 
         select(cpf, age) %>% 
-        mutate(age = age + rel_data)
+        mutate(age = age + rel_data) %>% 
+        group_by(cpf) %>% 
+        summarise(age = mean(age, na.rm = TRUE)) %>% 
+        ungroup() %>% 
+        mutate(age = ifelse(is.nan(age), NA_real_, age))
       
       suffix_aux = paste0("_", rel_data)
       
       #merge
       df = df %>% 
-        left_join(sub_df, by = c("cpf"), suffix = c("", suffix_aux))
+        left_join(sub_df, by = c("cpf"), suffix = c("", suffix_aux),
+                  na_matches = "never")
       
       rm(rel_year, filename, sub_df, suffix_aux)
     }
@@ -213,22 +203,29 @@ for (y in c(initial_year:final_year)){
                                     T ~ NA_character_),
              hire_month = as.Date(hire_month, format = "%d%m%Y"),
              hire_year = format(hire_month, "%Y"),
-             hire_year = as.integer(hire_year)) %>% 
-      select(-c("hire_month", "nc"))
+             hire_year = as.integer(hire_year),
+             hire_month = format(hire_month,"%m"),
+             hire_month = as.integer(hire_month))
     
   } else{
     df = df %>% 
       mutate(hire_month = as.character(hire_month),
              hire_year = substr(hire_month, 1, 4),
-             hire_year = as.integer(hire_year)) %>% 
-      select(-c("hire_month"))
+             hire_year = as.integer(hire_year),
+             hire_month = substr(hire_month,5,6),
+             hire_month = as.integer(hire_month)) 
   }
+  
+  #convert layoff month to integer
+  df = df %>% 
+    mutate(quit_month = as.integer(quit_month))
   
   #select only columns we need
   columns_to_keep = c("cpf", "ano", "cnpj_cei", "cnpj", "active", "sex",
                       "real_earnings", "emp_type", "quit_reason", "wk_hours", 
                       "emp_time","cnae_95", "munic", "educ", "age", 
-                      "cbo_02","legal_nature", "hire_month")
+                      "cbo_02","legal_nature", "hire_month", "hire_year", 
+                      "quit_month")
   
   df = df %>% 
     select(all_of(columns_to_keep)) %>% 
