@@ -15,11 +15,13 @@ if (!require("tidyr")) install.packages("splitstackshape", repos = repository)
 if (!require("ggplot2")) install.packages("splitstackshape", repos = repository)
 if (!require("readr")) install.packages("splitstackshape", repos = repository)
 if (!require("purrr")) install.packages("splitstackshape", repos = repository)
+if (!require("data.table")) install.packages("splitstackshape", repos = repository)
 
 library(tidyverse)
 library(arrow)
 library(haven)
 library(readxl)
+library(data.table)
 
 data_path = "Z:/Bernardus/Cunha_Santos_Doornik/Dta_files/"
 
@@ -44,13 +46,36 @@ cutoff_low_layoff = -0.1
 ###############################
 #Auxiliary loans df
 loans = read_dta(paste0(data_path, "hd_SCR_indivudal_loans.dta"))
-loans = loans %>% 
-  mutate(year = substr(as.character(time_id), 1, 4),
-         year = as.integer(year),
-         cpf = as.numeric(cpf)) %>% 
-  select(-c(time_id))
-
+setDT(loans)
 print(summary(loans))
+
+loans[, `:=`(mes = substr(as.character(time_id), 5, 6),
+             year = substr(as.character(time_id), 1, 4),
+             cpf = as.numeric(cpf))]
+
+loans[, year := as.integer(year)]
+print(unique(loans$mes))
+
+
+loans = loans[mes == "12"]
+loans[, `:=`(time_id = NULL, mes = NULL)]
+
+#Guarantee one line of loans per individual/year
+nrow_ini = nrow(loans)
+
+loans = loans[, n_appear := seq_len(.N), by = .(cpf, year)]
+loans = loans[n_appear == 1]
+loans = loans[, n_appear := NULL]
+
+nrow_fin = nrow(loans)
+print(paste0("Rows lost: ", (nrow_ini - nrow_fin)))
+rm(nrow_ini, nrow_fin)
+loans = tibble(loans)
+
+#save in order to not have to run this agais (too long)
+newfile_scr = paste0(data_path, "hd_scr_clean.parquet")
+write_parquet(rais, newfile_scr)
+rm(newfile_scr)
 
 #vectors to fill
 ever_treated = c()
@@ -87,6 +112,10 @@ for (y in initial_year:final_year){
   #With minimum tenure
   rais = rais %>% 
     filter(emp_time >= min_years * 12)
+  
+  #Drop individuals without earnings (probably input error)
+  rais = rais %>% 
+    filter(real_earnings > 0)
   
   #add information on the firm level and filter by firm size
   firm_info = read_parquet(paste0(data_path, "emp_panel.parquet")) %>% 
@@ -144,12 +173,12 @@ for (y in initial_year:final_year){
   }
   
   
-  ##COMENTAR!!!!!!
+  #COMENTAR!!!!!!
   # rais = rais %>%
   #   mutate(across(c("encontrado", "encontrado_la2", "encontrado_la3"),
   #                 ~ 1))
-  
-  #drop individuals that, even though were supposedly working for 3 eyars,
+
+  #drop individuals that, even though were supposedly working for 3 years,
   #had not appeared in rais in the previous 3 years
   rais = rais %>% 
     filter(!is.na(encontrado), !is.na(encontrado_la2), !is.na(encontrado_la3)) %>% 
@@ -158,6 +187,13 @@ for (y in initial_year:final_year){
   #add debt level
   rais = rais %>% 
     left_join(loans, by = c('cpf', 'year'), na_matches = 'never')
+  
+  #Calculate and print how many individuals were found on SCR
+  rais = rais %>%  
+    mutate(found_scr = ifelse(!is.na(loan_outstanding), 1, 0))
+  print(paste0("Individuals found and not on SCR on year ", y, ":"))
+  rais %>% count(found_scr) %>% mutate(share = n/sum(n)) %>% print()
+  rais = rais %>% select(-c(found_scr))
   
   #define treated and potential control
   rais = rais %>% 
@@ -192,10 +228,15 @@ for (y in initial_year:final_year){
   rais = rais %>% 
     mutate(
       #quartile of firm size (n employees)
-      quartile_size = cut_number(n_employees, 4),
+      quartile_size = ntile(n_employees, 4),
       #debt ratio and decile debt ratio
-      debt_ratio = loan_outstanding/(12*real_earnings),
-      decile_debt = cut_number(debt_ratio, 10))
+      debt_ratio = loan_outstanding/(12*real_earnings))
+  
+  #Print summary information of some years
+  if(y %in% c(2011, 2012)) print(summary(rais))
+  rais = rais %>% 
+    mutate(decile_debt = ntile(debt_ratio, 10))
+      
   
   #Skill level
   rais = rais %>% 
@@ -222,7 +263,7 @@ for (y in initial_year:final_year){
   rais = rais %>% 
     mutate(tenure = round(emp_time/12))
   
-  #drop individuals withou cnae and debt ratio
+  #drop individuals without cnae and debt ratio
   rais = rais %>% 
     mutate(cnae1 = substr(as.character(cnae_95), 1,1)) %>% 
     filter(!is.na(cnae1), !is.na(debt_ratio), !is.na(skill_b))
@@ -231,7 +272,7 @@ for (y in initial_year:final_year){
   filename = paste0(data_path, "potential_sample_", y, '.parquet')
   write_parquet(rais, filename)
   
-  if(y == final_year) print(summary(rais))
+  if(y %in% c(initial_year, 2010, 2012 ,final_year)) print(summary(rais))
   
   rm(rais)
   gc()
@@ -251,4 +292,5 @@ message = paste0("Time to create all potential  ",
                  round(difftime(c, a, units = 'hours'), 1), ' hours')
 print(message)
 
-
+rm(list = ls())
+gc()
