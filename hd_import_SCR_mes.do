@@ -36,7 +36,7 @@ GROUP BY
 #delimit cr
 display in smcl as text "`sql_statement'"
 odbc load, exec("`sql_statement';") dsn("Teradata Sede")
-save "\\sbcdf060\depep02$\Bernardus\Cunha_Santos_Doornik\Dta_files\hd_SCR_indivudal_`year'`x'.dta", replace
+save "\\sbcdf060\depep02$\Bernardus\Cunha_Santos_Doornik\Dta_files\hd_SCR_individual_`year'`x'.dta", replace
 
 }
 }
@@ -74,7 +74,7 @@ GROUP BY
 #delimit cr
 display in smcl as text "`sql_statement'"
 odbc load, exec("`sql_statement';") dsn("Teradata Sede")
-save "\\sbcdf060\depep02$\Bernardus\Cunha_Santos_Doornik\Dta_files\hd_SCR_indivudal_loans_`year'`x'.dta", replace
+save "\\sbcdf060\depep02$\Bernardus\Cunha_Santos_Doornik\Dta_files\hd_SCR_individual_loans_`year'`x'.dta", replace
 
 }
 }
