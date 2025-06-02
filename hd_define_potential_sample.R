@@ -2,8 +2,10 @@
 #This code will:
 #- Combine datasets to construct sample of potential candidates to match,
 # for each year
-#- we must firs run hd_clean_rais_companies and hd_import_SCR
+#- Run after hd_clean_rais_companies and hd_clean_loans
 #------------------------------------------------------------------------------------------------------------------------------
+
+
 options(file.download.method="wininet")
 repository = "http://artifactory.bcnet.bcb.gov.br/artifactory/cran-remote/"
 if (!require("dplyr")) install.packages("splitstackshape", repos=repository)
@@ -26,7 +28,7 @@ library(data.table)
 data_path = "Z:/Bernardus/Cunha_Santos_Doornik/Dta_files/"
 
 #COMENTAR
-# data_path = "C:/Users/xande/OneDrive/Documentos/Doutorado/RA/Household Debt/Data/"
+data_path = "C:/Users/xande/OneDrive/Documentos/Doutorado/RA/Household Debt/Data/"
 
 a = Sys.time()
 
@@ -44,38 +46,6 @@ cutoff_low_layoff = -0.1
 ###############################
 #Base sample selection and variable construction
 ###############################
-#Auxiliary loans df
-loans = read_dta(paste0(data_path, "hd_SCR_indivudal_loans.dta"))
-setDT(loans)
-print(summary(loans))
-
-loans[, `:=`(mes = substr(as.character(time_id), 5, 6),
-             year = substr(as.character(time_id), 1, 4),
-             cpf = as.numeric(cpf))]
-
-loans[, year := as.integer(year)]
-print(unique(loans$mes))
-
-
-loans = loans[mes == "12"]
-loans[, `:=`(time_id = NULL, mes = NULL)]
-
-#Guarantee one line of loans per individual/year
-nrow_ini = nrow(loans)
-
-loans = loans[, n_appear := seq_len(.N), by = .(cpf, year)]
-loans = loans[n_appear == 1]
-loans = loans[, n_appear := NULL]
-
-nrow_fin = nrow(loans)
-print(paste0("Rows lost: ", (nrow_ini - nrow_fin)))
-rm(nrow_ini, nrow_fin)
-loans = tibble(loans)
-
-#save in order to not have to run this agais (too long)
-newfile_scr = paste0(data_path, "hd_scr_clean.parquet")
-write_parquet(rais, newfile_scr)
-rm(newfile_scr)
 
 #vectors to fill
 ever_treated = c()
@@ -174,15 +144,21 @@ for (y in initial_year:final_year){
   
   
   #COMENTAR!!!!!!
-  # rais = rais %>%
-  #   mutate(across(c("encontrado", "encontrado_la2", "encontrado_la3"),
-  #                 ~ 1))
+  rais = rais %>%
+    mutate(across(c("encontrado", "encontrado_la2", "encontrado_la3"),
+                  ~ 1))
 
   #drop individuals that, even though were supposedly working for 3 years,
   #had not appeared in rais in the previous 3 years
   rais = rais %>% 
     filter(!is.na(encontrado), !is.na(encontrado_la2), !is.na(encontrado_la3)) %>% 
     select(-c("encontrado", "encontrado_la2", "encontrado_la3"))
+  
+  
+  
+  #Open loans data - REMEBER; IF WE CHANGE HERE WE ALSO HAVE TO CHANGE IN CREATE PANEL!!!
+  filename = paste0(data_path, "hd_scr_ind_clean_", y, ".parquet")
+  loans = read_parquet(filename) 
   
   #add debt level
   rais = rais %>% 

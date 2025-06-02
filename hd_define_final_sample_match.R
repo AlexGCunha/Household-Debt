@@ -3,6 +3,7 @@
 #- From the potential sample from code 'hd_define_potential_sample', run
 # additional filterings;
 #- Match treated x control individuals. And then treated x treated
+#- Run after hd_define_potential_sample
 #------------------------------------------------------------------------------------------------------------------------------
 options(file.download.method="wininet")
 repository = "http://artifactory.bcnet.bcb.gov.br/artifactory/cran-remote/"
@@ -15,11 +16,11 @@ if (!require("tidyr")) install.packages("splitstackshape", repos = repository)
 if (!require("ggplot2")) install.packages("splitstackshape", repos = repository)
 if (!require("readr")) install.packages("splitstackshape", repos = repository)
 if (!require("purrr")) install.packages("splitstackshape", repos = repository)
-if (!require("MatchIt")) install.packages("splitstackshape", repos = repository)
+if (!require("data.table")) install.packages("splitstackshape", repos = repository)
 
 library(tidyverse)
 library(arrow)
-library(MatchIt)
+library(data.table)
 
 data_path = "Z:/Bernardus/Cunha_Santos_Doornik/Dta_files/"
 
@@ -35,49 +36,20 @@ final_year = 2014
 treated_multiple_times_aux = read_rds(paste0(data_path, "treated_multiple_times.rds"))
 ever_treated_aux = read_rds(paste0(data_path, 'ever_treated.rds'))
 
-#auxiliary function to retrieve matched pairs after matching procedure
-retrieve_pairs = function(df, model){
-  #create matching matrix, with info about matching pairs
-  match_matrix = as.data.frame(model$match.matrix)
-  match_matrix = match_matrix %>% 
-    rownames_to_column() %>% 
-    rename(paired_treated = rowname,
-           paired_control = V1) %>% 
-    #Add a label to this pair of matches
-    mutate(match_id = seq(1:nrow(match_matrix))) %>% 
-    #drop non-matched individuals
-    filter(!is.na(paired_control))
-  
-  #Add matching information back to matching dataset
-  df = df %>% 
-    left_join(match_matrix %>% select(!paired_control),
-              join_by(rowname==paired_treated),
-              na_matches = 'never') %>% 
-    left_join(match_matrix %>% select(!paired_treated),
-              join_by(rowname == paired_control),
-              na_matches = 'never') %>% 
-    mutate(match_id = ifelse(is.na(match_id.x), match_id.y, match_id.x)) %>% 
-    select(cpf, match_id)
-  
-  return(df)
-}
-
-
 #Loop to match for every year
 for(y in initial_year:final_year){
   b = Sys.time()
   filename = paste0(data_path, "potential_sample_", y, ".parquet")
   df = read_parquet(filename)
   
-  #define high and low debt level as top and low 25% of debt ratio
-  q25_debt = quantile(df$debt_ratio, 0.25)
-  q75_debt = quantile(df$debt_ratio, 0.75)
+  #define high and low debt level as above/below median
+  q50_debt = quantile(df$debt_ratio, 0.5)
   
   df = df %>% 
-    mutate(high_debt = case_when(debt_ratio >= q75_debt ~ 1,
-                                 debt_ratio <= q25_debt ~ 0,
+    mutate(high_debt = case_when(debt_ratio >= q50_debt ~ 1,
+                                 debt_ratio < q50_debt ~ 0,
                                  T ~ NA))
-  rm(q25_debt, q75_debt)
+  rm(q50_debt)
   
   #add ever treated and treated multiple times info
   df = df %>% 
@@ -92,61 +64,137 @@ for(y in initial_year:final_year){
     filter(drop1 == 0, drop2 == 0) %>% 
     select(-c(drop1, drop2, ever_treated, treated_multiple_times))
   
+  #Guarantee there are no NAs on the matching variables and cpf
+  df = df %>% 
+    filter(!is.na(cpf) & !is.na(age) & !is.na(tenure) & !is.na(cnae1)
+           & !is.na(n_employees) & !is.na(high_debt) 
+           & !is.na(real_earnings) & !is.na(sex))
+  
+  #additional variable creation
+  quants_employees = quantile(df$n_employees, c(0.25, 0.5, 0.75))
+  df = df %>% 
+    mutate(real_earnings_bins = cut_width(real_earnings, 250),
+           n_employees_quants = fcase(
+             n_employees <= quants_employees[1], 1,
+             n_employees > quants_employees[1] & n_employees <= quants_employees[2], 2,
+             n_employees > quants_employees[2] & n_employees <= quants_employees[3], 2,
+             default = 4))
+  
+  
   #----------------------------------
   #First Match: Treated x Control
   #----------------------------------
-  df_match = df %>% rownames_to_column()
+  df_match = copy(df) %>% data.table()
   
-  #Exact Matching
-  m1 = matchit(treated ~ debt_ratio + real_earnings + n_employees + factor(age) + 
-                 factor(uf)  + factor(tenure) + factor(cnae1),
-               method = "cem",
-               cutpoints = list(real_earnings = seq(0, max(df_match$real_earnings), 250),
-                                n_employees = "q4",
-                                debt_ratio = "q10"),
-               data = df_match,
-               k2k = TRUE) # for 1:1 matching
+  treated_workers = df_match[treated == 1, 
+                              .(cpf, age, uf,tenure, cnae1, n_employees_quants,
+                                high_debt, real_earnings_bins, sex)]
+  setnames(treated_workers, old = "cpf", new = "cpf_treated")
   
-  match_pairs = retrieve_pairs(df_match, m1) %>% 
-    rename(first_match_id = match_id)
+  control_workers = df_match[treated == 0, 
+                              .(cpf, age, uf,tenure, cnae1, n_employees_quants,
+                                high_debt, real_earnings_bins, sex)]
+  setnames(control_workers, old = "cpf", new = "cpf_control")
   
-  #update main df
+  
+  matched_workers = merge(treated_workers, control_workers, 
+                          by = c('high_debt', 
+                                 'n_employees_quants', 'real_earnings_bins',
+                                 "age", "uf", "tenure", "cnae1", "sex"),
+                          all.x = TRUE, allow.cartesian = TRUE)
+  
+  #drop unmatched workers
+  matched_workers = matched_workers[!is.na(cpf_control)]
+  
+  #Create an indicator for the group and order of appearance within group
+  matched_workers[, order_treated := seq_len(.N), by = .(cpf_treated)]
+  matched_workers[, order_control := seq_len(.N), by = .(cpf_control)]
+  
+  #keep when the values are equal. This will give the exact match we want, preserving
+  #the maximum number of matches without replacement
+  matched_workers = matched_workers[order_treated == order_control]
+  
+  #keep just the info we want
+  matched_workers = matched_workers[, .(cpf_control, cpf_treated)]
+  matched_workers = matched_workers %>% rownames_to_column(var = "first_match_id")
+  matched_workers = matched_workers %>% 
+    pivot_longer(cols = c("cpf_treated", "cpf_control"),
+                                                     values_to = "cpf") %>% 
+    select(-c(name))
+  
+  #updates main df
   df = df %>% 
-    left_join(match_pairs, by = c('cpf'), na_matches = 'never') %>% 
+    left_join(matched_workers, by = c('cpf'), na_matches = 'never') %>% 
     filter(!is.na(first_match_id))
   
-  rm(m1, match_pairs, df_match)
+  rm(matched_workers,control_workers, treated_workers, df_match)
   
   #----------------------------------
   #Second Match: Treated High Debt x Treated Low Debt
   #----------------------------------
-  df_match = df %>% 
+  df_match = copy(df) %>% 
     filter(treated == 1,
            !is.na(high_debt)) %>% 
-    rownames_to_column()
+    data.table()
   
-  m2 = matchit(high_debt ~ real_earnings + n_employees + factor(age) + 
-                 factor(uf) + factor(tenure) + factor(cnae1),
-               method = "cem",
-               cutpoints = list(real_earnings = seq(0, 
-                                                    max(df_match$real_earnings), 
-                                                    250),
-                                n_employees = "q4"),
-               data = df_match,
-               k2k = TRUE) #for 1:1 matching
+  treated_workers = df_match[high_debt == 1, 
+                             .(cpf, age, uf,tenure, cnae1, n_employees_quants,
+                               real_earnings_bins, sex)]
+  setnames(treated_workers, old = "cpf", new = "cpf_treated")
   
-  match_pairs = retrieve_pairs(df_match, m2) %>% 
-    rename(second_match_id = match_id)
+  control_workers = df_match[high_debt == 0, 
+                             .(cpf, age, uf,tenure, cnae1, n_employees_quants,
+                               real_earnings_bins, sex)]
+  setnames(control_workers, old = "cpf", new = "cpf_control")
   
+  
+  matched_workers = merge(treated_workers, control_workers, 
+                          by = c('n_employees_quants', 'real_earnings_bins',
+                                 "age", "uf", "tenure", "cnae1", "sex"),
+                          all.x = TRUE, allow.cartesian = TRUE)
+  
+  #drop unmatched workers
+  matched_workers = matched_workers[!is.na(cpf_control)]
+  
+  #Create an indicator for the group and order of appearance within group
+  matched_workers[, order_treated := seq_len(.N), by = .(cpf_treated)]
+  matched_workers[, order_control := seq_len(.N), by = .(cpf_control)]
+  
+  #keep when the values are equal. This will give the exact match we want, preserving
+  #the maximum number of matches without replacement
+  matched_workers = matched_workers[order_treated == order_control]
+  
+  #keep just the info we want
+  matched_workers = matched_workers[, .(cpf_control, cpf_treated)]
+  matched_workers = matched_workers %>% rownames_to_column(var = "second_match_id")
+  matched_workers = matched_workers %>% 
+    pivot_longer(cols = c("cpf_treated", "cpf_control"),
+                 values_to = "cpf") %>% 
+    select(-c(name))
+  
+  #updates main df
   df = df %>% 
-    left_join(match_pairs, by = "cpf", na_matches = "never")
+    left_join(matched_workers, by = c('cpf'), na_matches = 'never')
   
-  rm(match_pairs, m2, df_match)
+  rm(matched_workers,control_workers, treated_workers, df_match)
+  
+  
+  #----------------------------------
+  #Additional modifications and save
+  #----------------------------------
+  #Print number of matched obs per year
+  n_first_match = length(unique(df$cpf))/2
+  n_second_match = df %>% filter(!is.na(second_match_id)) %>% 
+    select(cpf) %>% unique() %>% nrow()/2
+  message = paste0("Number of matches in ", y, ": ", 
+                   "first_match: ", n_first_match, 
+                   "; second_match: ", n_second_match)
+  print(message)
   
   #Select columns to keep
   df = df %>% 
     select(cpf, year, treated, first_match_id, second_match_id, high_debt, cbo_02,
-           cnpj_cei, cnpj, real_earnings, debt_ratio, skill_b, uf, age, 
+           cnpj_cei, cnpj, real_earnings, debt_ratio, skill_b, uf, age, sex,
            n_employees,munic, quit_month_le1)
   
   #Add "_b" suffix to indicate that the variable is at the baseline year
@@ -155,6 +203,7 @@ for(y in initial_year:final_year){
            cbo_02_b = cbo_02,
            cnpj_cei_b = cnpj_cei,
            cnpj_b = cnpj,
+           sex_b = sex,
            debt_ratio_b = debt_ratio,
            real_earnings_b = real_earnings,
            uf_b = uf, 
@@ -167,7 +216,7 @@ for(y in initial_year:final_year){
   filename = paste0(data_path, "matched_sample_", y, ".parquet")
   write_parquet(df, filename)
   
-  if(y == final_year) print(summary(df))
+  if(y == final_year | y == initial_year) print(summary(df))
   
   c = Sys.time()
   message = paste0(round(difftime(c, b, units = 'mins'), 1), 

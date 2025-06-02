@@ -28,7 +28,7 @@ scr_path = "Z:/DATA/Dta_files/SCR_TERADATA"
 a = Sys.time()
 setwd(data_path)
 
-initial_year = 2003
+initial_year = 2015 #originally 2003
 final_year = 2019
 
 #aux df with deflators

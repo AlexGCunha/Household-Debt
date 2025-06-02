@@ -88,6 +88,33 @@ write_dta(loans, "../Data/hd_SCR_indivudal_loans.dta")
 
 rm(list = ls())
 
+
+#################################
+#Create fake SCR loans - one archive per year
+#################################
+initial_year = 2006
+final_year = 2015
+
+nsamp = 500000
+for(year in initial_year:final_year){
+  loans = tibble(
+    ano = rep(year, nsamp),
+    cpf = sample(c(1:(nsamp/2)), nsamp, TRUE),
+    loan_outstanding = sample(c(1000:1000000), nsamp, TRUE)) %>% 
+    mutate(time_id = paste0(ano, "12")) %>% 
+    select(-ano) %>% 
+    group_by(time_id, cpf) %>% 
+    summarise(loan_outstanding = sum(loan_outstanding)) %>% 
+    ungroup()
+  
+  #save
+  write_dta(loans, paste0("../Data/hd_SCR_individual_",year,"12.dta"))
+  write_dta(loans, paste0("../Data/hd_SCR_individual_loans_",year,"12.dta"))
+}
+
+
+rm(list = ls())
+
 #################################
 #Create fake employment panel
 #################################
@@ -163,6 +190,18 @@ for(y in (initial_year:final_year)){
   
   rm(aux)
 }
+
+#################################
+#Create fake match ids
+#################################
+bal_panel = read_parquet("../data/agg_panel.parquet")
+
+size = length(unique(bal_panel$cpf))/4
+second_match_values = sample(1:size, nrow(bal_panel), replace = TRUE)
+bal_panel[, second_match_id := second_match_values]
+teste = copy(bal_panel)
+write_parquet(teste, "../data/agg_panel.parquet")
+rm(teste, bal_panel, size, second_match_values)
 
 
 
